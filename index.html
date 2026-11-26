@@ -205,15 +205,12 @@ function phHTML(c, big){
 function imgFail(img, name){
   const c = DATA.find(x=>x.name===name);
   if(!c) return;
-  const d = document.createElement('div');
-  d.innerHTML = phHTML(c, img.closest('.img'));
-  img.replaceWith(d.firstChild);
-  if(!autoGet(name) && !autoPending[name]){
-    autoFetch(c, function(){
-      const u = autoGet(name);
-      if(u) updateCardPhoto(name, u);
-    });
-  }
+  if(autoGet(name)) autoSet(name, '');
+  if(!autoPending[name]) autoFetch(c, function(){ const u = autoGet(name); if(u) updateCardPhoto(name, u); });
+  const col = colors[c.brand]||'#4f8cff';
+  const ph = document.createElement('div');
+  ph.innerHTML = '<svg width="260" height="200" xmlns="http://www.w3.org/2000/svg"><rect width="100%" height="100%" rx="8" fill="#141a24"/><circle cx="70" cy="80" r="30" fill="none" stroke="'+col+'" stroke-width="4"/><circle cx="190" cy="80" r="30" fill="none" stroke="'+col+'" stroke-width="4"/><path d="M70 60 l20 20 -20 20z M190 60 l20 20 -20 20z" fill="'+col+'"/><text x="130" y="150" fill="#8b93a5" font-size="15" text-anchor="middle">'+esc(c.brand)+'</text></svg>';
+  img.replaceWith(ph.firstChild);
 }
 function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 const sel = new Set();
@@ -325,12 +322,11 @@ function detail(name){
   migratePhoto(name);
   const c = DATA.find(x=>x.name===name);
   const k = phKeyOf(c);
-  const a6 = autoGet(name);
-  const u = (a6 ? a6.replace('width=640','width=1280') : '') || photoUrl(c, 1280);
+  const u = autoGet(name) || photoUrl(c, 1280);
   const ph = customPhotos(name);
   if(!u && !ph.length) autoFetch(c, function(){ if(curDetailName === name) detail(name); });
   const slides = ph.map(function(src,i){ return {src:src, cap:'Ваше фото '+(i+1)+' из '+ph.length+' — сохранено в этом браузере', own:true}; });
-  if(u) slides.push({src:u, cap:(k && !a6 ? 'Фото: '+esc(PH[k])+' (Wikimedia Commons)' : 'Фото: Wikimedia Commons'), own:false});
+  if(u) slides.push({src:u, cap:(u===autoGet(name) ? 'Фото: Wikimedia Commons' : (k ? 'Фото: '+esc(PH[k])+' (Wikimedia Commons)' : 'Фото: Wikimedia Commons')), own:false});
   if(galName !== name){ galName = name; galCur = 0; }
   if(galCur >= slides.length) galCur = Math.max(0, slides.length-1);
   const s = slides.length ? slides[galCur] : null;
@@ -476,87 +472,76 @@ function buySearch(name){
 }
 
 // ===== АВТОПОДБОР ФОТО С WIKIMEDIA COMMONS =====
-function autoKey(n){ return 'gp_auto::' + n; }
+function autoKey(n){ return 'gp_auto2::' + n; }
 function autoGet(n){ try{ return localStorage.getItem(autoKey(n)) || ''; } catch(e){ return ''; } }
 function autoSet(n, url){ try{ localStorage.setItem(autoKey(n), url); } catch(e){} }
 const autoPending = {};
-const autoQueue = [];
+const autoUsed = {};
 let autoActive = 0;
 const AUTO_MAX = 3;
 function autoBadTitle(t){
-  return /(diagram|schemat|block_diagram|pinout|logo|chart|table|infobox|die ?shot|front side|side view|back side|laptop|notebook|monitor|motherboard|packag|crystal|silicon|benchmark|watercool)/i.test(t);
+  return /(diagram|schemat|block_diagram|pinout|logo|chart|table|infobox|die ?shot|front side|side view|back side|screenshot|webm|theora|ogv|video of|video \(|play ?button|youtube|unboxing|bundle|accessor|cable|packag|laptop|notebook|motherboard|mainboard|painting|artwork|drawing|poster)/i.test(t);
 }
-function autoTokens(n){
-  return String(n).toLowerCase().replace(/[^a-z0-9]+/g,' ').split(/\s+/).filter(function(w){ return w.length>=2; });
-}
-function autoTitleOk(title, name){
-  const t = String(title).toLowerCase();
-  const toks = autoTokens(name);
-  let hits = 0;
-  toks.forEach(function(w){ if(t.indexOf(w) >= 0) hits++; });
-  return hits >= 2;
-}
-function autoFileOk(title){
-  return /\.(jpe?g|png)$/i.test(String(title || '')) && !autoBadTitle(title);
-}
-function autoFilePath(title, w){
-  return 'https://commons.wikimedia.org/wiki/Special:FilePath/' + encodeURIComponent(String(title).replace(/^File:/,'')) + (w ? '?width=' + w : '');
-}
-function autoWikiData(name, done){
-  const surl = 'https://www.wikidata.org/w/api.php?action=wbsearchentities&format=json&origin=*&language=en&limit=5&search=' + encodeURIComponent(name);
-  fetch(surl).then(function(r){ return r.json(); }).then(function(j){
-    const list = (j && j.search) || [];
-    let i = 0;
-    (function next(){
-      if(i >= list.length){ done(null); return; }
-      const id = list[i++].id;
-      const curl = 'https://www.wikidata.org/w/api.php?action=wbgetclaims&format=json&origin=*&entity=' + id + '&property=P18';
-      fetch(curl).then(function(r){ return r.json(); }).then(function(cj){
-        const claims = (cj && cj.claims && cj.claims.P18) || [];
-        const title = (claims.length && claims[0].mainsnak && claims[0].mainsnak.datavalue) ? claims[0].mainsnak.datavalue.value : null;
-        if(title && autoFileOk(title)){ done(autoFilePath(title, 640)); }
-        else next();
-      }).catch(next);
-    })();
-  }).catch(function(){ done(null); });
-}
-function autoCommons(name, done){
-  const queries = [name + ' graphics card', name + ' GPU', name + ' video card'];
-  let qi = 0;
-  (function tryQuery(){
-    if(qi >= queries.length){ done(null); return; }
-    const url = 'https://commons.wikimedia.org/w/api.php?action=query&format=json&origin=*&generator=search&gsrnamespace=6&gsrsearch='
-      + encodeURIComponent('filetype:bitmap ' + queries[qi++])
-      + '&gsrlimit=10&prop=imageinfo&iiprop=url|size&iiurlwidth=640';
-    fetch(url).then(function(r){ return r.json(); }).then(function(j){
-      const pages = (j && j.query && j.query.pages)
-        ? Object.keys(j.query.pages).map(function(k){ return j.query.pages[k]; }) : [];
-      const good = pages.filter(function(p){
-        if(!p.imageinfo || !p.imageinfo.length) return false;
-        const ii = p.imageinfo[0];
-        if(!autoFileOk(p.title || '')) return false;
-        if(!autoTitleOk(p.title || '', name)) return false;
-        return (ii.width || 0) >= 500;
-      });
-      if(good.length){
-        const pick = good[0].imageinfo[0].thumburl || good[0].imageinfo[0].url;
-        done(pick);
-      } else tryQuery();
-    }).catch(function(){ tryQuery(); });
-  })();
+function autoModelOk(name, title){
+  const tt = String(title || '').toLowerCase();
+  const toks = (name.match(/[a-z]*\d+[a-z]*/gi) || []).filter(function(t){ return t.length >= 3; });
+  if(!toks.length) return true;
+  return toks.some(function(t){ return tt.indexOf(t.toLowerCase()) >= 0; });
 }
 function autoFetch(c, done){
   const name = c.name;
   if(autoPending[name]){ if(done) done(); return; }
   autoPending[name] = true;
   function finish(){ if(done) done(); }
-  autoWikiData(name, function(u){
-    if(u){ autoSet(name, u); updateCardPhoto(name, u); finish(); return; }
-    autoCommons(name, function(u2){
-      if(u2){ autoSet(name, u2); updateCardPhoto(name, u2); }
+  function takeFirst(list){
+    for(let i = 0; i < list.length; i++){
+      const u = list[i];
+      if(!autoUsed[u]){ autoUsed[u] = 1; return u; }
+    }
+    return null;
+  }
+  function commonsSearch(){
+    const queries = [name + ' graphics card', name + ' GPU', name + ' video card'];
+    let qi = 0;
+    function tryQuery(){
+      if(qi >= queries.length){ finish(); return; }
+      const url = 'https://commons.wikimedia.org/w/api.php?action=query&format=json&origin=*&generator=search&gsrnamespace=6&gsrsearch='
+        + encodeURIComponent('filetype:bitmap ' + queries[qi++])
+        + '&gsrlimit=10&prop=imageinfo&iiprop=url|size&iiurlwidth=640';
+      fetch(url).then(function(r){ return r.json(); }).then(function(j){
+        const pages = (j && j.query && j.query.pages)
+          ? Object.keys(j.query.pages).map(function(k){ return j.query.pages[k]; }) : [];
+        const good = pages.filter(function(p){
+          if(!p.imageinfo || !p.imageinfo.length) return false;
+          const ii = p.imageinfo[0];
+          if(!/\.(jpe?g|png)$/i.test(p.title || '')) return false;
+          if(autoBadTitle(p.title || '')) return false;
+          if(!autoModelOk(name, p.title || '')) return false;
+          return (ii.width || 0) >= 400;
+        }).map(function(p){ return p.imageinfo[0].thumburl || p.imageinfo[0].url; });
+        const u = takeFirst(good);
+        if(u){ autoSet(name, u); updateCardPhoto(name, u); finish(); }
+        else tryQuery();
+      }).catch(function(){ tryQuery(); });
+    }
+    tryQuery();
+  }
+  const wdSearch = 'https://www.wikidata.org/w/api.php?action=wbsearchentities&format=json&origin=*&language=en&limit=1&search=' + encodeURIComponent(name);
+  fetch(wdSearch).then(function(r){ return r.json(); }).then(function(j){
+    const hit = (j && j.search && j.search[0]) ? j.search[0] : null;
+    if(!hit || !hit.id || !autoModelOk(name, (hit.label || '') + ' ' + (hit.description || ''))) return commonsSearch();
+    return fetch('https://www.wikidata.org/w/api.php?action=wbgetclaims&format=json&origin=*&entity=' + encodeURIComponent(hit.id) + '&property=P18').then(function(r){ return r.json(); }).then(function(j2){
+      const cl = (j2 && j2.claims && j2.claims.P18 && j2.claims.P18[0]) ? j2.claims.P18[0] : null;
+      const file = cl && cl.mainsnak && cl.mainsnak.datavalue ? cl.mainsnak.datavalue.value : null;
+      if(typeof file !== 'string' || !/\.(jpe?g|png)$/i.test(file) || autoBadTitle(file)) return commonsSearch();
+      const u = 'https://commons.wikimedia.org/wiki/Special:FilePath/' + encodeURIComponent(file) + '?width=640';
+      if(autoUsed[u]) return commonsSearch();
+      autoUsed[u] = 1;
+      autoSet(name, u);
+      updateCardPhoto(name, u);
       finish();
-    });
-  });
+    }).catch(commonsSearch);
+  }).catch(commonsSearch);
 }
 function updateCardPhoto(name, url){
   const tile = document.querySelector('.card[data-name="' + CSS.escape(name) + '"] .ph');
@@ -566,6 +551,7 @@ function updateCardPhoto(name, url){
 const autoQueueCards = [];
 function bootAuto(){
   DATA.forEach(function(c){
+    if(photoUrl(c)) return;
     if(customPhotos(c.name).length) return;
     if(autoGet(c.name)) return;
     autoQueueCards.push(c);
