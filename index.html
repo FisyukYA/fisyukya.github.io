@@ -198,16 +198,19 @@ function phKeyOf(c){
 function phHTML(c, big){
   const mine = customPhotos(c.name);
   if(mine.length) return '<img loading="lazy" src="'+mine[0]+'" alt="'+esc(c.name)+'" style="max-width:100%;object-fit:contain">';
-  const u = photoUrl(c);
+  const u = autoGet(c.name) || photoUrl(c);
   if(u) return '<img loading="lazy" src="'+u+'" alt="'+esc(c.name)+'" onerror="imgFail(this,'+JSON.stringify(c.name).replace(/"/g,'&quot;')+')">';
   return '<svg width="'+(big?260:180)+'" height="'+(big?200:120)+'" xmlns="http://www.w3.org/2000/svg"><rect width="100%" height="100%" rx="8" fill="#141a24"/><circle cx="70" cy="80" r="30" fill="none" stroke="'+(colors[c.brand]||'#4f8cff')+'" stroke-width="4"/><circle cx="190" cy="80" r="30" fill="none" stroke="'+(colors[c.brand]||'#4f8cff')+'" stroke-width="4"/><path d="M70 60 l20 20 -20 20z M190 60 l20 20 -20 20z" fill="'+(colors[c.brand]||'#4f8cff')+'"/><text x="130" y="150" fill="#8b93a5" font-size="15" text-anchor="middle">'+esc(c.brand)+'</text></svg>';
 }
 function imgFail(img, name){
   const c = DATA.find(x=>x.name===name);
   if(!c) return;
-  const d = document.createElement('div');
-  d.innerHTML = phHTML(c, img.closest('.img'));
-  img.replaceWith(d.firstChild);
+  if(autoGet(name)) autoSet(name, '');
+  if(!autoPending[name]) autoFetch(c, function(){ const u = autoGet(name); if(u) updateCardPhoto(name, u); });
+  const col = colors[c.brand]||'#4f8cff';
+  const ph = document.createElement('div');
+  ph.innerHTML = '<svg width="260" height="200" xmlns="http://www.w3.org/2000/svg"><rect width="100%" height="100%" rx="8" fill="#141a24"/><circle cx="70" cy="80" r="30" fill="none" stroke="'+col+'" stroke-width="4"/><circle cx="190" cy="80" r="30" fill="none" stroke="'+col+'" stroke-width="4"/><path d="M70 60 l20 20 -20 20z M190 60 l20 20 -20 20z" fill="'+col+'"/><text x="130" y="150" fill="#8b93a5" font-size="15" text-anchor="middle">'+esc(c.brand)+'</text></svg>';
+  img.replaceWith(ph.firstChild);
 }
 function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 const sel = new Set();
@@ -319,11 +322,11 @@ function detail(name){
   migratePhoto(name);
   const c = DATA.find(x=>x.name===name);
   const k = phKeyOf(c);
-  const u = photoUrl(c, 1280) || autoGet(name);
+  const u = autoGet(name) || photoUrl(c, 1280);
   const ph = customPhotos(name);
   if(!u && !ph.length) autoFetch(c, function(){ if(curDetailName === name) detail(name); });
   const slides = ph.map(function(src,i){ return {src:src, cap:'Ваше фото '+(i+1)+' из '+ph.length+' — сохранено в этом браузере', own:true}; });
-  if(u) slides.push({src:u, cap:(k ? 'Фото: '+esc(PH[k])+' (Wikimedia Commons)' : 'Фото: Wikimedia Commons'), own:false});
+  if(u) slides.push({src:u, cap:(u===autoGet(name) ? 'Фото: Wikimedia Commons' : (k ? 'Фото: '+esc(PH[k])+' (Wikimedia Commons)' : 'Фото: Wikimedia Commons')), own:false});
   if(galName !== name){ galName = name; galCur = 0; }
   if(galCur >= slides.length) galCur = Math.max(0, slides.length-1);
   const s = slides.length ? slides[galCur] : null;
