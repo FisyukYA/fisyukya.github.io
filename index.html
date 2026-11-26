@@ -88,6 +88,11 @@ td.sec,th.sec{background:#12151d;color:var(--txt);font-weight:700;font-size:13px
 #lbxClose{position:absolute;top:10px;right:14px;background:rgba(0,0,0,.55);color:#fff;border:none;border-radius:8px;padding:6px 12px;font-size:14px;cursor:pointer}
 #lbxClose:hover{background:rgba(0,0,0,.85)}
 #lbxHint{position:absolute;bottom:10px;left:50%;transform:translateX(-50%);color:#7b8798;font-size:12px}
+.buy{margin-top:18px;border:1px solid var(--line);border-radius:12px;padding:12px}
+.buy h4{margin:0 0 8px;font-size:14px;color:var(--mut);font-weight:600}
+.buy .brow{display:flex;flex-wrap:wrap;gap:8px}
+.buy .brow a{display:inline-block;padding:8px 14px;border:1px solid var(--line);border-radius:8px;color:var(--acc);text-decoration:none;font-size:13px;transition:border-color .15s}
+.buy .brow a:hover{border-color:var(--acc)}
 </style></head><body>
 <div class="wrap">
 <h1>Сравнение видеокарт</h1>
@@ -234,7 +239,7 @@ function render(){
       '<div class="rowline"><span>Память</span><b>'+fmtMem(c.mem)+' '+esc(c.mt)+'</b></div>'+
       '<div class="rowline"><span>Boost</span><b>'+(c.boost? c.boost+' МГц':'—')+'</b></div>'+
       '<div class="rowline"><span>TGP</span><b>'+c.tgp+' Вт</b></div>'+
-      '<div class="cbtns"><button class="link" onclick="event.stopPropagation();detail(this.closest(\'.card\').dataset.name)">Подробнее</button>'+
+      '<div class="cbtns"><button class="link" onclick="event.stopPropagation();detail(this.closest(\'.card\').dataset.name)">Подробнее</button><button class="link" onclick="event.stopPropagation();openPrices(this.closest(\'.card\').dataset.name)">₽ Цены</button>'+
       '<span style="flex:1"></span><label><input type="checkbox" class="cbx" '+(checked?'checked':'')+' onclick="event.stopPropagation();toggleSel(\''+esc(c.name)+'\',this)"> сравнить</label></div>'+
     '</div>';
   }).join('');
@@ -357,7 +362,7 @@ function detail(name){
   for(const [title, rows] of SECS){
     secs += '<div class="msec"><h4>'+title+'</h4>'+rows.map(r=>'<div class="mrow"><span>'+r[0]+'</span><b>'+r[1](c)+'</b></div>').join('')+'</div>';
   }
-  document.getElementById('mbox').innerHTML = '<button class="close" onclick="closeModal()">✕</button><h2 class="brand-'+c.brand+'">'+esc(c.name)+'</h2><div class="meta">'+cls(c)+' · '+c.year+'</div>'+big+cap+thumbs+pmgr+secs;
+  document.getElementById('mbox').innerHTML = '<button class="close" onclick="closeModal()">✕</button><h2 class="brand-'+c.brand+'">'+esc(c.name)+'</h2><div class="meta">'+cls(c)+' · '+c.year+'</div>'+big+cap+thumbs+pmgr+secs+buyHTML(c);
   document.getElementById('modal').style.display='flex';
 }
 function closeModal(){ document.getElementById('modal').style.display='none'; }
@@ -545,7 +550,34 @@ function wkSearch(q, cb){
     + encodeURIComponent(q + ' graphics card');
   fetch(url).then(function(r){ return r.json(); }).then(function(j){ cb(wkPick(j)); }).catch(function(){ cb(null); });
 }
-(function warmPhotos(){
+(/* ===== Блок «Где купить» — партнёрские магазины =====
+   Поле aff — сюда вписать партнёрский параметр из Admitad (например aff=xxxxx).
+   Он добавится ко всем ссылкам во всех карточках одной правкой. */
+const SHOPS = {
+  'ДНС':         {url:'https://www.dns-shop.ru/search/?q={q}', aff:'', sep:'&'},
+  'Ситилинк':    {url:'https://www.citilink.ru/search/?text={q}', aff:'', sep:'&'},
+  'Ozon':        {url:'https://www.ozon.ru/search/?text={q}', aff:'', sep:'&'},
+  'Wildberries': {url:'https://www.wildberries.ru/catalog/0/search.aspx?search={q}', aff:'', sep:'&'},
+  'Я.Маркет':    {url:'https://market.yandex.ru/search?text={q}', aff:'', sep:'&'}
+};
+function buyHTML(c){
+  const q = encodeURIComponent(c.name + ' видеокарта');
+  const links = Object.keys(SHOPS).map(function(s){
+    const sh = SHOPS[s];
+    const aff = sh.aff ? sh.sep + sh.aff : '';
+    return '<a href="' + sh.url.replace('{q}', q) + aff + '" target="_blank" rel="nofollow noopener">' + s + '</a>';
+  }).join('');
+  return '<div class="buy" id="buyblock"><h4>Где купить — откроется поиск магазина по модели</h4><div class="brow">' + links + '</div></div>';
+}
+function openPrices(name){
+  detail(name);
+  setTimeout(function(){
+    const el = document.getElementById('buyblock');
+    if(el) el.scrollIntoView({block:'end', behavior:'smooth'});
+  }, 80);
+}
+
+function warmPhotos(){
   const need = DATA.filter(function(c){ return !photoUrl(c) && !AUTO[c.name]; }).map(function(c){ return c.name; });
   let qi = 0, found = 0, active = 0;
   function updateView(){
