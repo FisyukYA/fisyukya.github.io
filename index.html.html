@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="ru"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Сравнение видеокарт</title>
+<style>
+:root{--bg:#0f1115;--card:#171b23;--line:#262c38;--txt:#e8ebf2;--mut:#8b93a5;--acc:#4f8cff;--good:#3ecf6e;--bad:#ff5d5d}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--txt);font-family:-apple-system,'Segoe UI',Roboto,Arial,sans-serif;font-size:15px}
+.wrap{max-width:1240px;margin:0 auto;padding:16px}
+h1{font-size:22px;margin:8px 0 4px}
+.sub{color:var(--mut);font-size:13px;margin-bottom:14px}
+.filters{display:flex;flex-wrap:wrap;gap:8px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:14px}
+.filters input,.filters select{background:#0d1017;border:1px solid var(--line);border-radius:8px;color:var(--txt);padding:8px 10px;font-size:14px}
+.filters input[type=text]{flex:1;min-width:180px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px;cursor:pointer;transition:border-color .15s}
+.card:hover{border-color:var(--acc)}
+.card .ph{height:130px;display:flex;align-items:center;justify-content:center;background:#0d1017;border-radius:8px;margin-bottom:10px;overflow:hidden}
+.card .ph img{max-width:100%;max-height:130px;object-fit:contain}
+.card h3{font-size:15px;margin-bottom:4px;line-height:1.3}
+.meta{color:var(--mut);font-size:12px;margin-bottom:8px}
+.pbar{height:6px;background:#0d1017;border-radius:4px;overflow:hidden;margin:6px 0 10px}
+.pbar i{display:block;height:100%;background:linear-gradient(90deg,#4f8cff,#9b5cff)}
+.rowline{display:flex;justify-content:space-between;font-size:13px;color:var(--mut)}
+.rowline b{color:var(--txt);font-weight:600}
+.cbtns{display:flex;gap:6px;margin-top:10px;align-items:center}
+.cbtns label{font-size:12.5px;color:var(--mut);display:flex;gap:4px;align-items:center;cursor:pointer}
+.link{background:none;border:none;color:var(--acc);cursor:pointer;font-size:13px;padding:0}
+.brand-NVIDIA{color:#76b900}.brand-AMD{color:#ed1c24}.brand-Intel{color:#009fd6}
+.topbar{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);background:var(--acc);color:#fff;border:none;border-radius:24px;padding:12px 26px;font-size:15px;cursor:pointer;display:none;box-shadow:0 6px 24px rgba(79,140,255,.45);z-index:50}
+.cmp{display:none;margin-top:18px}
+.cmp h2{font-size:19px;margin-bottom:10px}
+.tools{display:flex;gap:14px;align-items:center;margin-bottom:10px;color:var(--mut);font-size:13.5px;flex-wrap:wrap}
+.tools label{display:flex;gap:6px;align-items:center;cursor:pointer}
+.tw{overflow-x:auto;border:1px solid var(--line);border-radius:12px}
+table{border-collapse:collapse;width:100%;font-size:13.5px;min-width:720px}
+th,td{border-bottom:1px solid var(--line);padding:9px 12px;text-align:left;vertical-align:top}
+th{background:#12151d;color:var(--mut);font-weight:600;position:sticky;top:0}
+th .cp{font-size:12px;color:var(--mut);font-weight:400}
+td.sec,th.sec{background:#12151d;color:var(--txt);font-weight:700;font-size:13px;letter-spacing:.4px}
+.good{color:var(--good);font-weight:600}.bad{color:var(--bad)}
+.tdl{color:var(--mut)}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.65);display:none;align-items:flex-start;justify-content:center;padding:30px 12px;z-index:100;overflow-y:auto}
+.mbox{background:var(--card);border:1px solid var(--line);border-radius:14px;max-width:560px;width:100%;padding:20px}
+.mbox h2{font-size:19px;margin-bottom:2px}
+.mbox .img{height:220px;background:#0d1017;border-radius:10px;margin:12px 0;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.mbox .img img{max-width:100%;max-height:220px;object-fit:contain}
+.phc{font-size:11.5px;color:var(--mut);text-align:right;margin-top:3px}
+.msec{margin-top:14px}
+.msec h4{font-size:13px;color:var(--acc);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px}
+.mrow{display:flex;justify-content:space-between;border-bottom:1px solid var(--line);padding:5px 0;font-size:13.5px}
+.mrow span{color:var(--mut)}.mrow b{font-weight:600;text-align:right}
+.close{float:right;background:none;border:none;color:var(--mut);font-size:20px;cursor:pointer}
+.count{color:var(--mut);font-size:13px}
+.back{margin-top:14px}
+@media(max-width:640px){.grid{grid-template-columns:repeat(auto-fill,minmax(160px,1fr))}.card .ph{height:100px}.card .ph img{max-height:100px}}
+
+.pmgr{display:flex;gap:8px;margin:8px 0 14px;flex-wrap:wrap}
+.pbtn{display:inline-block;padding:7px 14px;border:1px solid #3a4356;border-radius:8px;background:#1a2130;color:#cfd6e4;font-size:13px;cursor:pointer;user-select:none}
+.pbtn:hover{background:#232c3e}
+.pbtn.warn{color:#ff9d9d;border-color:#5a3038}
+.pbtn.warn:hover{background:#3a2026}
+.imgwrap{position:relative}
+.garr{position:absolute;top:50%;transform:translateY(-50%);background:rgba(0,0,0,.55);color:#fff;border:none;border-radius:50%;width:30px;height:30px;font-size:18px;line-height:1;cursor:pointer;z-index:2}
+.garr:hover{background:rgba(0,0,0,.8)}
+.garr.left{left:6px}
+.garr.right{right:6px}
+.gcnt{color:#8fd18f;font-weight:600}
+.thumbs{display:flex;gap:6px;flex-wrap:wrap;margin:10px 0 4px}
+.thumb{position:relative;width:64px;height:48px;border:2px solid #262c38;border-radius:6px;overflow:hidden;cursor:pointer;flex:0 0 auto}
+.thumb:hover{border-color:#4f8cff}
+.thumb.cur{border-color:#4f8cff}
+.thumb img{width:100%;height:100%;object-fit:cover;display:block}
+.tx{position:absolute;top:1px;right:1px;background:rgba(0,0,0,.65);color:#fff;border:none;border-radius:4px;font-size:10px;line-height:1;padding:2px 4px;cursor:pointer;z-index:2}
+.tx:hover{background:rgba(180,40,40,.9)}
+.pbtn.dim{opacity:.6;cursor:default}
+.phc.custom{color:#9be29b}
+
+#lbx{position:fixed;inset:0;background:rgba(3,5,9,.94);z-index:1000;display:none;align-items:center;justify-content:center}
+#lbxImg{max-width:92vw;max-height:88vh;object-fit:contain;cursor:grab;user-select:none;-webkit-user-drag:none}
+#lbxImg.drag{cursor:grabbing}
+#lbx .larr{position:absolute;top:50%;transform:translateY(-50%);background:rgba(0,0,0,.55);color:#fff;border:none;border-radius:50%;width:44px;height:44px;font-size:26px;line-height:1;cursor:pointer;z-index:2}
+#lbx .larr:hover{background:rgba(0,0,0,.85)}
+#lbx .larr.left{left:18px}
+#lbx .larr.right{right:18px}
+#lbxTop{position:absolute;top:12px;left:50%;transform:translateX(-50%);color:#e8eef7;font-size:13px;max-width:70vw;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#lbxCnt{color:#8fd18f;font-weight:600;margin-right:10px}
+#lbxClose{position:absolute;top:10px;right:14px;background:rgba(0,0,0,.55);color:#fff;border:none;border-radius:8px;padding:6px 12px;font-size:14px;cursor:pointer}
+#lbxClose:hover{background:rgba(0,0,0,.85)}
+#lbxHint{position:absolute;bottom:10px;left:50%;transform:translateX(-50%);color:#7b8798;font-size:12px}
+</style></head><body>
+<div class="wrap">
+<h1>Сравнение видеокарт</h1>
+<div class="sub">База характеристик: 194 модели за 20 лет (2005–2025)</div>
+<div class="filters">
+<input type="text" id="q" placeholder="Поиск: RTX 4070, Navi 31, RDNA...">
+<select id="fBrand"><option value="">Все бренды</option><option>NVIDIA</option><option>AMD</option><option>Intel</option></select>
+<select id="fClass"><option value="">Все классы</option><option>Начальная</option><option>Средняя</option><option>Производительная</option><option>Флагман</option></select>
+<select id="fMem"><option value="">VRAM: любая</option><option value="2">от 2 ГБ</option><option value="4">от 4 ГБ</option><option value="6">от 6 ГБ</option><option value="8">от 8 ГБ</option><option value="10">от 10 ГБ</option><option value="12">от 12 ГБ</option><option value="16">от 16 ГБ</option></select>
+<select id="fYear"><option value="">Год: любой</option><option value="2010">от 2010</option><option value="2014">от 2014</option><option value="2016">от 2016</option><option value="2018">от 2018</option><option value="2020">от 2020</option><option value="2022">от 2022</option><option value="2023">от 2023</option><option value="2024">от 2024</option><option value="2025">от 2025</option></select>
+<label><input type="checkbox" id="fRay"> только с трассировкой</label>
+<select id="sort"><option value="perf">По производительности</option><option value="-year">По году (новые)</option><option value="year">По году (старые)</option><option value="boost">По Boost-частоте</option><option value="bw">По пропускной способности</option><option value="mem">По объёму памяти</option><option value="tgp">По энергопотреблению (возр.)</option><option value="name">По названию</option></select>
+<span class="count" id="cnt"></span>
+</div>
+<div class="grid" id="grid"></div>
+<button class="topbar" id="cmpBtn"></button>
+<div class="cmp" id="cmp"></div>
+</div>
+<div class="modal" id="modal"><div class="mbox" id="mbox"></div></div>
+<script>
+const DATA = [{"name": "GeForce 7800 GTX", "chip": "G70", "arch": "G70", "proc": "110 нм", "year": 2005, "perf": 0.7, "boost": 430, "sh": 24, "rt": 0, "tn": 0, "mem": 0.256, "mt": "GDDR3", "memf": 1200, "bus": 256, "bw": 38.4, "tgp": 86, "psu": 420, "pwr": "—", "dx": "9.0c", "ogl": "2.0", "vulk": "—", "ray": false, "up": "—", "res": "2560×1600", "mon": 2, "brand": "NVIDIA"}, {"name": "GeForce 7800 GT", "chip": "G70", "arch": "G70", "proc": "110 нм", "year": 2005, "perf": 0.6, "boost": 400, "sh": 20, "rt": 0, "tn": 0, "mem": 0.256, "mt": "GDDR3", "memf": 1200, "bus": 256, "bw": 38.4, "tgp": 69, "psu": 350, "pwr": "1×6-pin", "dx": "9.0c", "ogl": "2.0", "vulk": "—", "ray": false, "up": "—", "res": "2560×1600", "mon": 2, "brand": "NVIDIA"}, {"name": "GeForce 7900 GS", "chip": "G71", "arch": "G70", "proc": "90 нм", "year": 2006, "perf": 0.7, "boost": 450, "sh": 20, "rt": 0, "tn": 0, "mem": 0.256, "mt": "GDDR3", "memf": 1320, "bus": 256, "bw": 42.2, "tgp": 60, "psu": 350, "pwr": "1×6-pin", "dx": "9.0c", "ogl": "2.0", "vulk": "—", "ray": false, "up": "—", "res": "2560×1600", "mon": 2, "brand": "NVIDIA"}, {"name": "GeForce 7900 GT", "chip": "G71", "arch": "G70", "proc": "90 нм", "year": 2006, "perf": 0.8, "boost": 450, "sh": 24, "rt": 0, "tn": 0, "mem": 0.256, "mt": "GDDR3", "memf": 1320, "bus": 256, "bw": 42.2, "tgp": 62, "psu": 350, "pwr": "1×6-pin", "dx": "9.0c", "ogl": "2.0", "vulk": "—", "ray": false, "up": "—", "res": "2560×1600", "mon": 2, "brand": "NVIDIA"}, {"name": "GeForce 7900 GTX", "chip": "G71", "arch": "G70", "proc": "90 нм", "year": 2006, "perf": 0.9, "boost": 650, "sh": 24, "rt": 0, "tn": 0, "mem": 0.512, "mt": "GDDR3", "memf": 1600, "bus": 256, "bw": 51.2, "tgp": 84, "psu": 400, "pwr": "2×6-pin", "dx": "9.0c", "ogl": "2.0", "vulk": "—", "ray": false, "up": "—", "res": "2560×1600", "mon": 2, "brand": "NVIDIA"}, {"name": "GeForce 7950 GT", "chip": "G71", "arch": "G70", "proc": "90 нм", "year": 2006, "perf": 0.85, "boost": 550, "sh": 24, "rt": 0, "tn": 0, "mem": 0.512, "mt": "GDDR3", "memf": 1400, "bus": 256, "bw": 44.8, "tgp": 80, "psu": 400, "pwr": "2×6-pin", "dx": "9.0c", "ogl": "2.0", "vulk": "—", "ray": false, "up": "—", "res": "2560×1600", "mon": 2, "brand": "NVIDIA"}, {"name": "GeForce 7950 GX2", "chip": "2×G71", "arch": "G70", "proc": "90 нм", "year": 2006, "perf": 1.2, "boost": 500, "sh": 48, "rt": 0, "tn": 0, "mem": 1, "mt": "GDDR3", "memf": 1400, "bus": 512, "bw": 89.6, "tgp": 110, "psu": 400, "pwr": "1×6-pin", "dx": "9.0c", "ogl": "2.0", "vulk": "—", "ray": false, "up": "—", "res": "2560×1600", "mon": 4, "brand": "NVIDIA"}, {"name": "GeForce 7600 GT", "chip": "G73", "arch": "G70", "proc": "90 нм", "year": 2006, "perf": 0.5, "boost": 560, "sh": 12, "rt": 0, "tn": 0, "mem": 0.256, "mt": "GDDR3", "memf": 1400, "bus": 128, "bw": 22.4, "tgp": 40, "psu": 300, "pwr": "—", "dx": "9.0c", "ogl": "2.0", "vulk": "—", "ray": false, "up": "—", "res": "2560×1600", "mon": 2, "brand": "NVIDIA"}, {"name": "GeForce 8800 GTX", "chip": "G80", "arch": "Tesla", "proc": "90 нм", "year": 2006, "perf": 1.6, "boost": 576, "sh": 128, "rt": 0, "tn": 0, "mem": 0.768, "mt": "GDDR3", "memf": 1800, "bus": 384, "bw": 86.4, "tgp": 155, "psu": 450, "pwr": "2×6-pin", "dx": "10", "ogl": "2.1", "vulk": "—", "ray": false, "up": "—", "res": "2560×1600", "mon": 2, "brand": "NVIDIA"}, {"name": "GeForce 8800 GTS 640MB", "chip": "G80", "arch": "Tesla", "proc": "90 нм", "year": 2006, "perf": 1.2, "boost": 500, "sh": 96, "rt": 0, "tn": 0, "mem": 0.64, "mt": "GDDR3", "memf": 1600, "bus": 320, "bw": 64, "tgp": 143, "psu": 400, "pwr": "2×6-pin", "dx": "10", "ogl": "2.1", "vulk": "—", "ray": false, "up": "—", "res": "2560×1600", "mon": 2, "brand": "NVIDIA"}, {"name": "GeForce 8800 GTS 512MB", "chip": "G92", "arch": "Tesla", "proc": "65 нм", "year": 2007, "perf": 1.3, "boost": 650, "sh": 128, "rt": 0, "tn": 0, "mem": 0.512, "mt": "GDDR3", "memf": 1940, "bus": 256, "bw": 62, "tgp": 135, "psu": 400, "pwr": "2×6-pin", "dx": "10", "ogl": "2.1", "vulk": "—", "ray": false, "up": "—", "res": "2560×1600", "mon": 2, "brand": "NVIDIA"}, {"name": "GeForce 8800 GT", "chip": "G92", "arch": "Tesla", "proc": "65 нм", "year": 2007, "perf": 1.2, "boost": 600, "sh": 112, "rt": 0, "tn": 0, "mem": 0.512, "mt": "GDDR3", "memf": 1800, "bus": 256, "bw": 57.6, "tgp": 105, "psu": 400, "pwr": "1×6-pin", "dx": "10", "ogl": "2.1", "vulk": "—", "ray": false, "up": "—", "res": "2560×1600", "mon": 2, "brand": "NVIDIA"}, {"name": "GeForce 8800 GS", "chip": "G92", "arch": "Tesla", "proc": "65 нм", "year": 2008, "perf": 0.9, "boost": 550, "sh": 96, "rt": 0, "tn": 0, "mem": 0.384, "mt": "GDDR3", "memf": 1700, "bus": 192, "bw": 42.6, "tgp": 105, "psu": 400, "pwr": "1×6-pin", "dx": "10", "ogl": "2.1", "vulk": "—", "ray": false, "up": "—", "res": "2560×1600", "mon": 2, "brand": "NVIDIA"}, {"name": "GeForce 8600 GT", "chip": "G84", "arch": "Tesla", "proc": "80 нм", "year": 2007, "perf": 0.3, "boost": 540, "sh": 32, "rt": 0, "tn": 0, "mem": 0.512, "mt": "GDDR3", "memf": 1400, "bus": 128, "bw": 22.4, "tgp": 43, "psu": 300, "pwr": "—", "dx": "10", "ogl": "2.1", "vulk": "—", "ray": false, "up": "—", "res": "2560×1600", "mon": 2, "brand": "NVIDIA"}, {"name": "GeForce 8500 GT", "chip": "G86", "arch": "Tesla", "proc": "80 нм", "year": 2007, "perf": 0.2, "boost": 450, "sh": 16, "rt": 0, "tn": 0, "mem": 0.512, "mt": "DDR2", "memf": 800, "bus": 128, "bw": 12.8, "tgp": 45, "psu": 300, "pwr": "—", "dx": "10", "ogl": "2.1", "vulk": "—", "ray": false, "up": "—", "res": "2560×1600", "mon": 2, "brand": "NVIDIA"}, {"name": "GeForce 9800 GTX", "chip": "G92", "arch": "Tesla", "proc": "65 нм", "year": 2008, "perf": 1.4, "boost": 675, "sh": 128, "rt": 0, "tn": 0, "mem": 0.512, "mt": "GDDR3", "memf": 2200, "bus": 256, "bw": 70.4, "tgp": 140, "psu": 450, "pwr": "2×6-pin", "dx": "10", "ogl": "2.1", "vulk": "—", "ray": false, "up": "—", "res": "2560×1600", "mon": 2, "brand": "NVIDIA"}, {"name": "GeForce 9800 GT", "chip": "G92", "arch": "Tesla", "proc": "65 нм", "year": 2008, "perf": 1.2, "boost": 600, "sh": 112, "rt": 0, "tn": 0, "mem": 0.512, "mt": "GDDR3", "memf": 1800, "bus": 256, "bw": 57.6, "tgp": 105, "psu": 400, "pwr": "1×6-pin", "dx": "10", "ogl": "2.1", "vulk": "—", "ray": false, "up": "—", "res": "2560×1600", "mon": 2, "brand": "NVIDIA"}, {"name": "GeForce 9600 GT", "chip": "G94", "arch": "Tesla", "proc": "65 нм", "year": 2008, "perf": 0.7, "boost": 650, "sh": 64, "rt": 0, "tn": 0, "mem": 0.512, "mt": "GDDR3", "memf": 1800, "bus": 256, "bw": 57.6, "tgp": 96, "psu": 400, "pwr": "1×6-pin", "dx": "10", "ogl": "2.1", "vulk": "—", "ray": false, "up": "—", "res": "2560×1600", "mon": 2, "brand": "NVIDIA"}, {"name": "GeForce GTX 280", "chip": "GT200", "arch": "Tesla", "proc": "65 нм", "year": 2008, "perf": 3.6, "boost": 602, "sh": 240, "rt": 0, "tn": 0, "mem": 1, "mt": "GDDR3", "memf": 1107, "bus": 512, "bw": 141.8, "tgp": 236, "psu": 500, "pwr": "2×6-pin", "dx": "10", "ogl": "2.1", "vulk": "—", "ray": false, "up": "—", "res": "2560×1600", "mon": 2, "brand": "NVIDIA"}, {"name": "GeForce GTX 285", "chip": "GT200", "arch": "Tesla", "proc": "55 нм", "year": 2009, "perf": 3.7, "boost": 648, "sh": 240, "rt": 0, "tn": 0, "mem": 1, "mt": "GDDR3", "memf": 1242, "bus": 512, "bw": 159, "tgp": 183, "psu": 450, "pwr": "2×6-pin", "dx": "10", "ogl": "2.1", "vulk": "—", "ray": false, "up": "—", "res": "2560×1600", "mon": 2, "brand": "NVIDIA"}, {"name": "GeForce GTX 295", "chip": "2×GT200", "arch": "Tesla", "proc": "55 нм", "year": 2009, "perf": 5.6, "boost": 576, "sh": 480, "rt": 0, "tn": 0, "mem": 1.792, "mt": "GDDR3", "memf": 999, "bus": 896, "bw": 179.2, "tgp": 289, "psu": 650, "pwr": "8-pin", "dx": "10", "ogl": "2.1", "vulk": "—", "ray": false, "up": "—", "res": "2560×1600", "mon": 4, "brand": "NVIDIA"}, {"name": "GeForce GTX 260", "chip": "GT200", "arch": "Tesla", "proc": "65 нм", "year": 2008, "perf": 2.6, "boost": 576, "sh": 192, "rt": 0, "tn": 0, "mem": 0.896, "mt": "GDDR3", "memf": 999, "bus": 448, "bw": 111.9, "tgp": 182, "psu": 450, "pwr": "2×6-pin", "dx": "10", "ogl": "2.1", "vulk": "—", "ray": false, "up": "—", "res": "2560×1600", "mon": 2, "brand": "NVIDIA"}, {"name": "GeForce GTX 480", "chip": "GF100", "arch": "Fermi", "proc": "40 нм", "year": 2010, "perf": 4.6, "boost": 700, "sh": 480, "rt": 0, "tn": 0, "mem": 1.5, "mt": "GDDR5", "memf": 3696, "bus": 384, "bw": 177.4, "tgp": 250, "psu": 500, "pwr": "1×8+1×6-pin", "dx": "11", "ogl": "4.1", "vulk": "—", "ray": false, "up": "—", "res": "2560×1600", "mon": 2, "brand": "NVIDIA"}, {"name": "GeForce GTX 470", "chip": "GF100", "arch": "Fermi", "proc": "40 нм", "year": 2010, "perf": 4.0, "boost": 607, "sh": 352, "rt": 0, "tn": 0, "mem": 1.28, "mt": "GDDR5", "memf": 3348, "bus": 320, "bw": 134.8, "tgp": 215, "psu": 500, "pwr": "2×6-pin", "dx": "11", "ogl": "4.1", "vulk": "—", "ray": false, "up": "—", "res": "2560×1600", "mon": 2, "brand": "NVIDIA"}, {"name": "GeForce GTX 460", "chip": "GF104", "arch": "Fermi", "proc": "40 нм", "year": 2010, "perf": 2.6, "boost": 675, "sh": 336, "rt": 0, "tn": 0, "mem": 1, "mt": "GDDR5", "memf": 3600, "bus": 256, "bw": 115.2, "tgp": 150, "psu": 450, "pwr": "2×6-pin", "dx": "11", "ogl": "4.1", "vulk": "—", "ray": false, "up": "—", "res": "2560×1600", "mon": 2, "brand": "NVIDIA"}, {"name": "GeForce GTX 560 Ti", "chip": "GF114", "arch": "Fermi", "proc": "40 нм", "year": 2011, "perf": 4.2, "boost": 822, "sh": 384, "rt": 0, "tn": 0, "mem": 1, "mt": "GDDR5", "memf": 4004, "bus": 256, "bw": 128.1, "tgp": 170, "psu": 500, "pwr": "2×6-pin", "dx": "11", "ogl": "4.2", "vulk": "—", "ray": false, "up": "—", "res": "2560×1600", "mon": 2, "brand": "NVIDIA"}, {"name": "GeForce GTX 570", "chip": "GF110", "arch": "Fermi", "proc": "40 нм", "year": 2010, "perf": 5.6, "boost": 732, "sh": 480, "rt": 0, "tn": 0, "mem": 1.28, "mt": "GDDR5", "memf": 3800, "bus": 320, "bw": 152, "tgp": 219, "psu": 500, "pwr": "2×6-pin", "dx": "11", "ogl": "4.2", "vulk": "—", "ray": false, "up": "—", "res": "2560×1600", "mon": 2, "brand": "NVIDIA"}, {"name": "GeForce GTX 580", "chip": "GF110", "arch": "Fermi", "proc": "40 нм", "year": 2010, "perf": 6.4, "boost": 772, "sh": 512, "rt": 0, "tn": 0, "mem": 1.5, "mt": "GDDR5", "memf": 4008, "bus": 384, "bw": 192.4, "tgp": 244, "psu": 550, "pwr": "1×8+1×6-pin", "dx": "11", "ogl": "4.2", "vulk": "—", "ray": false, "up": "—", "res": "2560×1600", "mon": 2, "brand": "NVIDIA"}, {"name": "GeForce GTX 590", "chip": "2×GF110", "arch": "Fermi", "proc": "40 нм", "year": 2011, "perf": 8.0, "boost": 607, "sh": 1024, "rt": 0, "tn": 0, "mem": 3, "mt": "GDDR5", "memf": 3408, "bus": 768, "bw": 327.7, "tgp": 365, "psu": 700, "pwr": "2×8-pin", "dx": "11", "ogl": "4.2", "vulk": "—", "ray": false, "up": "—", "res": "2560×1600", "mon": 4, "brand": "NVIDIA"}, {"name": "GeForce GTX 550 Ti", "chip": "GF116", "arch": "Fermi", "proc": "40 нм", "year": 2011, "perf": 2.0, "boost": 900, "sh": 192, "rt": 0, "tn": 0, "mem": 1, "mt": "GDDR5", "memf": 4100, "bus": 192, "bw": 98.4, "tgp": 116, "psu": 400, "pwr": "1×6-pin", "dx": "11", "ogl": "4.2", "vulk": "—", "ray": false, "up": "—", "res": "2560×1600", "mon": 2, "brand": "NVIDIA"}, {"name": "GeForce GTX 650 Ti", "chip": "GK106", "arch": "Kepler", "proc": "28 нм", "year": 2012, "perf": 2.7, "boost": 861, "sh": 768, "rt": 0, "tn": 0, "mem": 1, "mt": "GDDR5", "memf": 5400, "bus": 128, "bw": 86.4, "tgp": 110, "psu": 400, "pwr": "1×6-pin", "dx": "11", "ogl": "4.3", "vulk": "1.2", "ray": false, "up": "—", "res": "2560×1600", "mon": 4, "brand": "NVIDIA"}, {"name": "GeForce GTX 650 Ti Boost", "chip": "GK106", "arch": "Kepler", "proc": "28 нм", "year": 2013, "perf": 3.0, "boost": 980, "sh": 768, "rt": 0, "tn": 0, "mem": 1, "mt": "GDDR5", "memf": 6000, "bus": 192, "bw": 96, "tgp": 110, "psu": 400, "pwr": "1×6-pin", "dx": "11", "ogl": "4.3", "vulk": "1.2", "ray": false, "up": "—", "res": "2560×1600", "mon": 4, "brand": "NVIDIA"}, {"name": "GeForce GTX 660", "chip": "GK106", "arch": "Kepler", "proc": "28 нм", "year": 2012, "perf": 4.6, "boost": 980, "sh": 960, "rt": 0, "tn": 0, "mem": 2, "mt": "GDDR5", "memf": 6000, "bus": 192, "bw": 144.2, "tgp": 140, "psu": 450, "pwr": "1×6-pin", "dx": "11", "ogl": "4.3", "vulk": "1.2", "ray": false, "up": "—", "res": "2560×1600", "mon": 4, "brand": "NVIDIA"}, {"name": "GeForce GTX 660 Ti", "chip": "GK104", "arch": "Kepler", "proc": "28 нм", "year": 2012, "perf": 5.3, "boost": 915, "sh": 1344, "rt": 0, "tn": 0, "mem": 2, "mt": "GDDR5", "memf": 6000, "bus": 192, "bw": 144.2, "tgp": 150, "psu": 450, "pwr": "2×6-pin", "dx": "11", "ogl": "4.3", "vulk": "1.2", "ray": false, "up": "—", "res": "2560×1600", "mon": 4, "brand": "NVIDIA"}, {"name": "GeForce GTX 670", "chip": "GK104", "arch": "Kepler", "proc": "28 нм", "year": 2012, "perf": 7.0, "boost": 980, "sh": 1344, "rt": 0, "tn": 0, "mem": 2, "mt": "GDDR5", "memf": 6000, "bus": 256, "bw": 160, "tgp": 170, "psu": 450, "pwr": "2×6-pin", "dx": "11", "ogl": "4.3", "vulk": "1.2", "ray": false, "up": "—", "res": "2560×1600", "mon": 4, "brand": "NVIDIA"}, {"name": "GeForce GTX 680", "chip": "GK104", "arch": "Kepler", "proc": "28 нм", "year": 2012, "perf": 8.0, "boost": 1058, "sh": 1536, "rt": 0, "tn": 0, "mem": 2, "mt": "GDDR5", "memf": 6000, "bus": 256, "bw": 160, "tgp": 195, "psu": 500, "pwr": "2×6-pin", "dx": "11", "ogl": "4.3", "vulk": "1.2", "ray": false, "up": "—", "res": "2560×1600", "mon": 4, "brand": "NVIDIA"}, {"name": "GeForce GTX 690", "chip": "2×GK104", "arch": "Kepler", "proc": "28 нм", "year": 2012, "perf": 11.0, "boost": 1019, "sh": 3072, "rt": 0, "tn": 0, "mem": 4, "mt": "GDDR5", "memf": 6000, "bus": 512, "bw": 320, "tgp": 300, "psu": 650, "pwr": "2×8-pin", "dx": "11", "ogl": "4.3", "vulk": "1.2", "ray": false, "up": "—", "res": "2560×1600", "mon": 4, "brand": "NVIDIA"}, {"name": "GeForce GTX Titan", "chip": "GK110", "arch": "Kepler", "proc": "28 нм", "year": 2013, "perf": 10.5, "boost": 837, "sh": 2688, "rt": 0, "tn": 0, "mem": 6, "mt": "GDDR5", "memf": 6000, "bus": 384, "bw": 288, "tgp": 250, "psu": 550, "pwr": "1×8+1×6-pin", "dx": "11", "ogl": "4.3", "vulk": "1.2", "ray": false, "up": "—", "res": "4096×2160", "mon": 4, "brand": "NVIDIA"}, {"name": "GeForce GTX 760", "chip": "GK104", "arch": "Kepler", "proc": "28 нм", "year": 2013, "perf": 6.2, "boost": 980, "sh": 1152, "rt": 0, "tn": 0, "mem": 2, "mt": "GDDR5", "memf": 6000, "bus": 256, "bw": 160, "tgp": 170, "psu": 450, "pwr": "2×6-pin", "dx": "11", "ogl": "4.3", "vulk": "1.2", "ray": false, "up": "—", "res": "2560×1600", "mon": 4, "brand": "NVIDIA"}, {"name": "GeForce GTX 770", "chip": "GK104", "arch": "Kepler", "proc": "28 нм", "year": 2013, "perf": 8.3, "boost": 1046, "sh": 1536, "rt": 0, "tn": 0, "mem": 2, "mt": "GDDR5", "memf": 7010, "bus": 256, "bw": 179.5, "tgp": 230, "psu": 500, "pwr": "1×8+1×6-pin", "dx": "11", "ogl": "4.3", "vulk": "1.2", "ray": false, "up": "—", "res": "2560×1600", "mon": 4, "brand": "NVIDIA"}, {"name": "GeForce GTX 780", "chip": "GK110", "arch": "Kepler", "proc": "28 нм", "year": 2013, "perf": 10.0, "boost": 863, "sh": 2304, "rt": 0, "tn": 0, "mem": 3, "mt": "GDDR5", "memf": 6000, "bus": 384, "bw": 288, "tgp": 250, "psu": 550, "pwr": "1×8+1×6-pin", "dx": "11", "ogl": "4.3", "vulk": "1.2", "ray": false, "up": "—", "res": "4096×2160", "mon": 4, "brand": "NVIDIA"}, {"name": "GeForce GTX 780 Ti", "chip": "GK110", "arch": "Kepler", "proc": "28 нм", "year": 2013, "perf": 12.0, "boost": 928, "sh": 2880, "rt": 0, "tn": 0, "mem": 3, "mt": "GDDR5", "memf": 7000, "bus": 384, "bw": 336, "tgp": 250, "psu": 550, "pwr": "1×8+1×6-pin", "dx": "11", "ogl": "4.4", "vulk": "1.2", "ray": false, "up": "—", "res": "4096×2160", "mon": 4, "brand": "NVIDIA"}, {"name": "GeForce GTX Titan Black", "chip": "GK110", "arch": "Kepler", "proc": "28 нм", "year": 2014, "perf": 12.5, "boost": 980, "sh": 2880, "rt": 0, "tn": 0, "mem": 6, "mt": "GDDR5", "memf": 7000, "bus": 384, "bw": 336, "tgp": 250, "psu": 550, "pwr": "1×8+1×6-pin", "dx": "11", "ogl": "4.4", "vulk": "1.2", "ray": false, "up": "—", "res": "4096×2160", "mon": 4, "brand": "NVIDIA"}, {"name": "GeForce GTX Titan Z", "chip": "2×GK110", "arch": "Kepler", "proc": "28 нм", "year": 2014, "perf": 14.5, "boost": 875, "sh": 5760, "rt": 0, "tn": 0, "mem": 12, "mt": "GDDR5", "memf": 7000, "bus": 768, "bw": 672, "tgp": 375, "psu": 700, "pwr": "2×8-pin", "dx": "11", "ogl": "4.4", "vulk": "1.2", "ray": false, "up": "—", "res": "4096×2160", "mon": 4, "brand": "NVIDIA"}, {"name": "GeForce GTX 750 Ti", "chip": "GM107", "arch": "Maxwell 1.0", "proc": "28 нм", "year": 2014, "perf": 3.4, "boost": 1020, "sh": 640, "rt": 0, "tn": 0, "mem": 2, "mt": "GDDR5", "memf": 5400, "bus": 128, "bw": 86.4, "tgp": 60, "psu": 400, "pwr": "—", "dx": "11", "ogl": "4.4", "vulk": "1.2", "ray": false, "up": "—", "res": "4096×2160", "mon": 4, "brand": "NVIDIA"}, {"name": "GeForce GTX 950", "chip": "GM206", "arch": "Maxwell", "proc": "28 нм", "year": 2015, "perf": 4.5, "boost": 1188, "sh": 768, "rt": 0, "tn": 0, "mem": 2, "mt": "GDDR5", "memf": 6610, "bus": 128, "bw": 105.8, "tgp": 90, "psu": 350, "pwr": "1×6-pin", "dx": "12", "ogl": "4.5", "vulk": "1.2", "ray": false, "up": "—", "res": "4096×2160", "mon": 4, "brand": "NVIDIA"}, {"name": "GeForce GTX 960", "chip": "GM206", "arch": "Maxwell", "proc": "28 нм", "year": 2015, "perf": 7.2, "boost": 1178, "sh": 1024, "rt": 0, "tn": 0, "mem": 2, "mt": "GDDR5", "memf": 7010, "bus": 128, "bw": 112.2, "tgp": 120, "psu": 400, "pwr": "1×6-pin", "dx": "12", "ogl": "4.5", "vulk": "1.2", "ray": false, "up": "—", "res": "4096×2160", "mon": 4, "brand": "NVIDIA"}, {"name": "GeForce GTX 970", "chip": "GM204", "arch": "Maxwell", "proc": "28 нм", "year": 2014, "perf": 12.4, "boost": 1178, "sh": 1664, "rt": 0, "tn": 0, "mem": 4, "mt": "GDDR5", "memf": 7010, "bus": 256, "bw": 224.3, "tgp": 145, "psu": 500, "pwr": "2×6-pin", "dx": "12", "ogl": "4.5", "vulk": "1.2", "ray": false, "up": "—", "res": "4096×2160", "mon": 4, "brand": "NVIDIA"}, {"name": "GeForce GTX 980", "chip": "GM204", "arch": "Maxwell", "proc": "28 нм", "year": 2014, "perf": 14.5, "boost": 1126, "sh": 2048, "rt": 0, "tn": 0, "mem": 4, "mt": "GDDR5", "memf": 7010, "bus": 256, "bw": 224.3, "tgp": 165, "psu": 500, "pwr": "2×6-pin", "dx": "12", "ogl": "4.5", "vulk": "1.2", "ray": false, "up": "—", "res": "4096×2160", "mon": 4, "brand": "NVIDIA"}, {"name": "GeForce GTX 980 Ti", "chip": "GM200", "arch": "Maxwell", "proc": "28 нм", "year": 2015, "perf": 18.5, "boost": 1075, "sh": 2816, "rt": 0, "tn": 0, "mem": 6, "mt": "GDDR5", "memf": 7010, "bus": 384, "bw": 336.5, "tgp": 250, "psu": 600, "pwr": "1×8+1×6-pin", "dx": "12", "ogl": "4.5", "vulk": "1.2", "ray": false, "up": "—", "res": "4096×2160", "mon": 4, "brand": "NVIDIA"}, {"name": "GeForce GTX Titan X", "chip": "GM200", "arch": "Maxwell", "proc": "28 нм", "year": 2015, "perf": 17.5, "boost": 1075, "sh": 3072, "rt": 0, "tn": 0, "mem": 12, "mt": "GDDR5", "memf": 7010, "bus": 384, "bw": 336.5, "tgp": 250, "psu": 600, "pwr": "1×8+1×6-pin", "dx": "12", "ogl": "4.5", "vulk": "1.2", "ray": false, "up": "—", "res": "4096×2160", "mon": 4, "brand": "NVIDIA"}, {"name": "GeForce GT 1030", "chip": "GP108", "arch": "Pascal", "proc": "14 нм", "year": 2017, "perf": 1.6, "boost": 1468, "sh": 384, "rt": 0, "tn": 0, "mem": 2, "mt": "GDDR5", "memf": 6000, "bus": 64, "bw": 48, "tgp": 30, "psu": 250, "pwr": "—", "dx": "12", "ogl": "4.6", "vulk": "1.2", "ray": false, "up": "—", "res": "4096×2160", "mon": 4, "brand": "NVIDIA"}, {"name": "GeForce GTX 1050", "chip": "GP107", "arch": "Pascal", "proc": "14 нм", "year": 2016, "perf": 3.6, "boost": 1392, "sh": 640, "rt": 0, "tn": 0, "mem": 2, "mt": "GDDR5", "memf": 7000, "bus": 128, "bw": 112, "tgp": 75, "psu": 350, "pwr": "—", "dx": "12", "ogl": "4.6", "vulk": "1.2", "ray": false, "up": "—", "res": "4096×2160", "mon": 4, "brand": "NVIDIA"}, {"name": "GeForce GTX 1050 3GB", "chip": "GP107", "arch": "Pascal", "proc": "14 нм", "year": 2018, "perf": 3.3, "boost": 1392, "sh": 768, "rt": 0, "tn": 0, "mem": 3, "mt": "GDDR5", "memf": 7000, "bus": 96, "bw": 84, "tgp": 75, "psu": 350, "pwr": "—", "dx": "12", "ogl": "4.6", "vulk": "1.2", "ray": false, "up": "—", "res": "4096×2160", "mon": 4, "brand": "NVIDIA"}, {"name": "GeForce GTX 1050 Ti", "chip": "GP107", "arch": "Pascal", "proc": "14 нм", "year": 2016, "perf": 4.8, "boost": 1392, "sh": 768, "rt": 0, "tn": 0, "mem": 4, "mt": "GDDR5", "memf": 7000, "bus": 128, "bw": 112, "tgp": 75, "psu": 350, "pwr": "—", "dx": "12", "ogl": "4.6", "vulk": "1.2", "ray": false, "up": "—", "res": "4096×2160", "mon": 4, "brand": "NVIDIA"}, {"name": "GeForce GTX 1060 3GB", "chip": "GP106", "arch": "Pascal", "proc": "16 нм", "year": 2016, "perf": 9.3, "boost": 1708, "sh": 1152, "rt": 0, "tn": 0, "mem": 3, "mt": "GDDR5", "memf": 8000, "bus": 192, "bw": 192, "tgp": 120, "psu": 450, "pwr": "1×6-pin", "dx": "12", "ogl": "4.6", "vulk": "1.2", "ray": false, "up": "—", "res": "7680×4320", "mon": 4, "brand": "NVIDIA"}, {"name": "GeForce GTX 1060 6GB", "chip": "GP106", "arch": "Pascal", "proc": "16 нм", "year": 2016, "perf": 9.8, "boost": 1708, "sh": 1280, "rt": 0, "tn": 0, "mem": 6, "mt": "GDDR5", "memf": 8000, "bus": 192, "bw": 192, "tgp": 120, "psu": 450, "pwr": "1×6-pin", "dx": "12", "ogl": "4.6", "vulk": "1.2", "ray": false, "up": "—", "res": "7680×4320", "mon": 4, "brand": "NVIDIA"}, {"name": "GeForce GTX 1070", "chip": "GP104", "arch": "Pascal", "proc": "16 нм", "year": 2016, "perf": 15.6, "boost": 1683, "sh": 1920, "rt": 0, "tn": 0, "mem": 8, "mt": "GDDR5", "memf": 8000, "bus": 256, "bw": 256, "tgp": 150, "psu": 500, "pwr": "1×8-pin", "dx": "12", "ogl": "4.6", "vulk": "1.2", "ray": false, "up": "—", "res": "7680×4320", "mon": 4, "brand": "NVIDIA"}, {"name": "GeForce GTX 1070 Ti", "chip": "GP104", "arch": "Pascal", "proc": "16 нм", "year": 2017, "perf": 17.5, "boost": 1683, "sh": 2432, "rt": 0, "tn": 0, "mem": 8, "mt": "GDDR5", "memf": 8000, "bus": 256, "bw": 256, "tgp": 180, "psu": 500, "pwr": "1×8-pin", "dx": "12", "ogl": "4.6", "vulk": "1.2", "ray": false, "up": "—", "res": "7680×4320", "mon": 4, "brand": "NVIDIA"}, {"name": "GeForce GTX 1080", "chip": "GP104", "arch": "Pascal", "proc": "16 нм", "year": 2016, "perf": 20.5, "boost": 1733, "sh": 2560, "rt": 0, "tn": 0, "mem": 8, "mt": "GDDR5X", "memf": 10000, "bus": 256, "bw": 320, "tgp": 180, "psu": 500, "pwr": "1×8-pin", "dx": "12", "ogl": "4.6", "vulk": "1.2", "ray": false, "up": "—", "res": "7680×4320", "mon": 4, "brand": "NVIDIA"}, {"name": "GeForce GTX 1080 Ti", "chip": "GP102", "arch": "Pascal", "proc": "16 нм", "year": 2017, "perf": 26.0, "boost": 1582, "sh": 3584, "rt": 0, "tn": 0, "mem": 11, "mt": "GDDR5X", "memf": 11012, "bus": 352, "bw": 484.4, "tgp": 250, "psu": 600, "pwr": "1×8+1×6-pin", "dx": "12", "ogl": "4.6", "vulk": "1.2", "ray": false, "up": "—", "res": "7680×4320", "mon": 4, "brand": "NVIDIA"}, {"name": "NVIDIA TITAN Xp", "chip": "GP102", "arch": "Pascal", "proc": "16 нм", "year": 2017, "perf": 22.0, "boost": 1582, "sh": 3840, "rt": 0, "tn": 0, "mem": 12, "mt": "GDDR5X", "memf": 11408, "bus": 384, "bw": 547.6, "tgp": 250, "psu": 600, "pwr": "1×8+1×6-pin", "dx": "12", "ogl": "4.6", "vulk": "1.2", "ray": false, "up": "—", "res": "7680×4320", "mon": 4, "brand": "NVIDIA"}, {"name": "GeForce GTX 1650", "chip": "TU117", "arch": "Turing", "proc": "12 нм", "year": 2019, "perf": 6.5, "boost": 1665, "sh": 896, "rt": 0, "tn": 0, "mem": 4, "mt": "GDDR5", "memf": 8000, "bus": 128, "bw": 128, "tgp": 75, "psu": 350, "pwr": "—", "dx": "12", "ogl": "4.6", "vulk": "1.2", "ray": false, "up": "—", "res": "7680×4320", "mon": 4, "brand": "NVIDIA"}, {"name": "GeForce GTX 1650 Super", "chip": "TU116", "arch": "Turing", "proc": "12 нм", "year": 2019, "perf": 9.5, "boost": 1725, "sh": 1280, "rt": 0, "tn": 0, "mem": 4, "mt": "GDDR6", "memf": 12000, "bus": 128, "bw": 192, "tgp": 100, "psu": 400, "pwr": "1×6-pin", "dx": "12", "ogl": "4.6", "vulk": "1.2", "ray": false, "up": "—", "res": "7680×4320", "mon": 4, "brand": "NVIDIA"}, {"name": "GeForce GTX 1660", "chip": "TU116", "arch": "Turing", "proc": "12 нм", "year": 2019, "perf": 12.0, "boost": 1785, "sh": 1408, "rt": 0, "tn": 0, "mem": 6, "mt": "GDDR5", "memf": 8000, "bus": 192, "bw": 192, "tgp": 120, "psu": 450, "pwr": "1×8-pin", "dx": "12", "ogl": "4.6", "vulk": "1.2", "ray": false, "up": "—", "res": "7680×4320", "mon": 4, "brand": "NVIDIA"}, {"name": "GeForce GTX 1660 Super", "chip": "TU116", "arch": "Turing", "proc": "12 нм", "year": 2019, "perf": 13.5, "boost": 1785, "sh": 1408, "rt": 0, "tn": 0, "mem": 6, "mt": "GDDR6", "memf": 14000, "bus": 192, "bw": 336, "tgp": 125, "psu": 450, "pwr": "1×8-pin", "dx": "12", "ogl": "4.6", "vulk": "1.2", "ray": false, "up": "—", "res": "7680×4320", "mon": 4, "brand": "NVIDIA"}, {"name": "GeForce GTX 1660 Ti", "chip": "TU116", "arch": "Turing", "proc": "12 нм", "year": 2019, "perf": 15.0, "boost": 1770, "sh": 1536, "rt": 0, "tn": 0, "mem": 6, "mt": "GDDR6", "memf": 12000, "bus": 192, "bw": 288, "tgp": 120, "psu": 450, "pwr": "1×8-pin", "dx": "12", "ogl": "4.6", "vulk": "1.2", "ray": false, "up": "—", "res": "7680×4320", "mon": 4, "brand": "NVIDIA"}, {"name": "GeForce RTX 2060", "chip": "TU106", "arch": "Turing", "proc": "12 нм", "year": 2019, "perf": 18.5, "boost": 1680, "sh": 1920, "rt": 46, "tn": 240, "mem": 6, "mt": "GDDR6", "memf": 14000, "bus": 192, "bw": 336, "tgp": 160, "psu": 500, "pwr": "1×8-pin", "dx": "12 Ultimate", "ogl": "4.6", "vulk": "1.2", "ray": true, "up": "DLSS 1", "res": "7680×4320", "mon": 4, "brand": "NVIDIA"}, {"name": "GeForce RTX 2060 12GB", "chip": "TU106", "arch": "Turing", "proc": "12 нм", "year": 2021, "perf": 19.5, "boost": 1710, "sh": 2176, "rt": 52, "tn": 272, "mem": 12, "mt": "GDDR6", "memf": 14000, "bus": 192, "bw": 336, "tgp": 184, "psu": 550, "pwr": "1×8-pin", "dx": "12 Ultimate", "ogl": "4.6", "vulk": "1.2", "ray": true, "up": "DLSS 1", "res": "7680×4320", "mon": 4, "brand": "NVIDIA"}, {"name": "GeForce RTX 2060 Super", "chip": "TU104", "arch": "Turing", "proc": "12 нм", "year": 2019, "perf": 21.0, "boost": 1650, "sh": 2176, "rt": 52, "tn": 272, "mem": 8, "mt": "GDDR6", "memf": 14000, "bus": 256, "bw": 448, "tgp": 175, "psu": 500, "pwr": "1×8-pin", "dx": "12 Ultimate", "ogl": "4.6", "vulk": "1.2", "ray": true, "up": "DLSS 1", "res": "7680×4320", "mon": 4, "brand": "NVIDIA"}, {"name": "GeForce RTX 2070", "chip": "TU106", "arch": "Turing", "proc": "12 нм", "year": 2018, "perf": 22.5, "boost": 1710, "sh": 2304, "rt": 54, "tn": 288, "mem": 8, "mt": "GDDR6", "memf": 14000, "bus": 256, "bw": 448, "tgp": 175, "psu": 500, "pwr": "1×8-pin", "dx": "12 Ultimate", "ogl": "4.6", "vulk": "1.2", "ray": true, "up": "DLSS 1", "res": "7680×4320", "mon": 4, "brand": "NVIDIA"}, {"name": "GeForce RTX 2070 Super", "chip": "TU104", "arch": "Turing", "proc": "12 нм", "year": 2019, "perf": 26.5, "boost": 1770, "sh": 2560, "rt": 64, "tn": 320, "mem": 8, "mt": "GDDR6", "memf": 14000, "bus": 256, "bw": 448, "tgp": 215, "psu": 550, "pwr": "1×8-pin", "dx": "12 Ultimate", "ogl": "4.6", "vulk": "1.2", "ray": true, "up": "DLSS 1", "res": "7680×4320", "mon": 4, "brand": "NVIDIA"}, {"name": "GeForce RTX 2080", "chip": "TU104", "arch": "Turing", "proc": "12 нм", "year": 2018, "perf": 28.0, "boost": 1710, "sh": 2944, "rt": 72, "tn": 368, "mem": 8, "mt": "GDDR6", "memf": 14000, "bus": 256, "bw": 448, "tgp": 215, "psu": 550, "pwr": "1×8-pin", "dx": "12 Ultimate", "ogl": "4.6", "vulk": "1.2", "ray": true, "up": "DLSS 1", "res": "7680×4320", "mon": 4, "brand": "NVIDIA"}, {"name": "GeForce RTX 2080 Super", "chip": "TU104", "arch": "Turing", "proc": "12 нм", "year": 2019, "perf": 30.0, "boost": 1815, "sh": 3072, "rt": 72, "tn": 384, "mem": 8, "mt": "GDDR6", "memf": 15500, "bus": 256, "bw": 496, "tgp": 250, "psu": 600, "pwr": "1×8-pin", "dx": "12 Ultimate", "ogl": "4.6", "vulk": "1.2", "ray": true, "up": "DLSS 1", "res": "7680×4320", "mon": 4, "brand": "NVIDIA"}, {"name": "GeForce RTX 2080 Ti", "chip": "TU102", "arch": "Turing", "proc": "12 нм", "year": 2018, "perf": 37.5, "boost": 1545, "sh": 4352, "rt": 72, "tn": 544, "mem": 11, "mt": "GDDR6", "memf": 14000, "bus": 352, "bw": 616, "tgp": 260, "psu": 650, "pwr": "2×8-pin", "dx": "12 Ultimate", "ogl": "4.6", "vulk": "1.2", "ray": true, "up": "DLSS 1", "res": "7680×4320", "mon": 4, "brand": "NVIDIA"}, {"name": "NVIDIA Titan RTX", "chip": "TU102", "arch": "Turing", "proc": "12 нм", "year": 2018, "perf": 38.0, "boost": 1770, "sh": 4608, "rt": 72, "tn": 576, "mem": 24, "mt": "GDDR6", "memf": 14000, "bus": 384, "bw": 672, "tgp": 280, "psu": 650, "pwr": "2×8-pin", "dx": "12 Ultimate", "ogl": "4.6", "vulk": "1.2", "ray": true, "up": "DLSS 1", "res": "7680×4320", "mon": 4, "brand": "NVIDIA"}, {"name": "GeForce RTX 3050 8GB", "chip": "GA106", "arch": "Ampere", "proc": "8 нм", "year": 2022, "perf": 14.0, "boost": 1777, "sh": 2560, "rt": 40, "tn": 80, "mem": 8, "mt": "GDDR6", "memf": 14000, "bus": 128, "bw": 224, "tgp": 130, "psu": 500, "pwr": "1×8-pin", "dx": "12 Ultimate", "ogl": "4.6", "vulk": "1.3", "ray": true, "up": "DLSS 2", "res": "7680×4320", "mon": 4, "brand": "NVIDIA"}, {"name": "GeForce RTX 3050 6GB", "chip": "GA107", "arch": "Ampere", "proc": "8 нм", "year": 2024, "perf": 12.0, "boost": 1470, "sh": 2304, "rt": 36, "tn": 72, "mem": 6, "mt": "GDDR6", "memf": 14000, "bus": 96, "bw": 168, "tgp": 70, "psu": 450, "pwr": "—", "dx": "12 Ultimate", "ogl": "4.6", "vulk": "1.3", "ray": true, "up": "DLSS 2", "res": "7680×4320", "mon": 4, "brand": "NVIDIA"}, {"name": "GeForce RTX 3060 12GB", "chip": "GA106", "arch": "Ampere", "proc": "8 нм", "year": 2021, "perf": 23.0, "boost": 1777, "sh": 3584, "rt": 56, "tn": 112, "mem": 12, "mt": "GDDR6", "memf": 15000, "bus": 192, "bw": 360, "tgp": 170, "psu": 550, "pwr": "1×8-pin", "dx": "12 Ultimate", "ogl": "4.6", "vulk": "1.3", "ray": true, "up": "DLSS 2", "res": "7680×4320", "mon": 4, "brand": "NVIDIA"}, {"name": "GeForce RTX 3060 8GB", "chip": "GA106", "arch": "Ampere", "proc": "8 нм", "year": 2022, "perf": 20.0, "boost": 1777, "sh": 3584, "rt": 56, "tn": 112, "mem": 8, "mt": "GDDR6", "memf": 15000, "bus": 192, "bw": 360, "tgp": 170, "psu": 550, "pwr": "1×8-pin", "dx": "12 Ultimate", "ogl": "4.6", "vulk": "1.3", "ray": true, "up": "DLSS 2", "res": "7680×4320", "mon": 4, "brand": "NVIDIA"}, {"name": "GeForce RTX 3060 Ti", "chip": "GA104", "arch": "Ampere", "proc": "8 нм", "year": 2020, "perf": 34.0, "boost": 1665, "sh": 4864, "rt": 76, "tn": 152, "mem": 8, "mt": "GDDR6", "memf": 14000, "bus": 256, "bw": 448, "tgp": 200, "psu": 550, "pwr": "1×12-pin", "dx": "12 Ultimate", "ogl": "4.6", "vulk": "1.3", "ray": true, "up": "DLSS 2", "res": "7680×4320", "mon": 4, "brand": "NVIDIA"}, {"name": "GeForce RTX 3070", "chip": "GA104", "arch": "Ampere", "proc": "8 нм", "year": 2020, "perf": 39.0, "boost": 1725, "sh": 5888, "rt": 92, "tn": 184, "mem": 8, "mt": "GDDR6", "memf": 14000, "bus": 256, "bw": 448, "tgp": 220, "psu": 550, "pwr": "1×12-pin", "dx": "12 Ultimate", "ogl": "4.6", "vulk": "1.3", "ray": true, "up": "DLSS 2", "res": "7680×4320", "mon": 4, "brand": "NVIDIA"}, {"name": "GeForce RTX 3070 Ti", "chip": "GA104", "arch": "Ampere", "proc": "8 нм", "year": 2021, "perf": 41.0, "boost": 1770, "sh": 6144, "rt": 96, "tn": 192, "mem": 8, "mt": "GDDR6X", "memf": 19000, "bus": 256, "bw": 508, "tgp": 290, "psu": 650, "pwr": "1×12-pin", "dx": "12 Ultimate", "ogl": "4.6", "vulk": "1.3", "ray": true, "up": "DLSS 2", "res": "7680×4320", "mon": 4, "brand": "NVIDIA"}, {"name": "GeForce RTX 3080 10GB", "chip": "GA102", "arch": "Ampere", "proc": "8 нм", "year": 2020, "perf": 48.0, "boost": 1710, "sh": 8704, "rt": 136, "tn": 272, "mem": 10, "mt": "GDDR6X", "memf": 19000, "bus": 320, "bw": 760, "tgp": 320, "psu": 750, "pwr": "2×8-pin", "dx": "12 Ultimate", "ogl": "4.6", "vulk": "1.3", "ray": true, "up": "DLSS 2", "res": "7680×4320", "mon": 4, "brand": "NVIDIA"}, {"name": "GeForce RTX 3080 12GB", "chip": "GA102", "arch": "Ampere", "proc": "8 нм", "year": 2022, "perf": 49.5, "boost": 1710, "sh": 8960, "rt": 140, "tn": 280, "mem": 12, "mt": "GDDR6X", "memf": 19000, "bus": 384, "bw": 760, "tgp": 350, "psu": 750, "pwr": "2×8-pin", "dx": "12 Ultimate", "ogl": "4.6", "vulk": "1.3", "ray": true, "up": "DLSS 2", "res": "7680×4320", "mon": 4, "brand": "NVIDIA"}, {"name": "GeForce RTX 3080 Ti", "chip": "GA102", "arch": "Ampere", "proc": "8 нм", "year": 2021, "perf": 53.0, "boost": 1665, "sh": 10240, "rt": 160, "tn": 320, "mem": 12, "mt": "GDDR6X", "memf": 19000, "bus": 384, "bw": 760, "tgp": 350, "psu": 750, "pwr": "1×12-pin", "dx": "12 Ultimate", "ogl": "4.6", "vulk": "1.3", "ray": true, "up": "DLSS 2", "res": "7680×4320", "mon": 4, "brand": "NVIDIA"}, {"name": "GeForce RTX 3090", "chip": "GA102", "arch": "Ampere", "proc": "8 нм", "year": 2020, "perf": 55.0, "boost": 1695, "sh": 10496, "rt": 164, "tn": 328, "mem": 24, "mt": "GDDR6X", "memf": 19500, "bus": 384, "bw": 936, "tgp": 350, "psu": 750, "pwr": "2×8-pin", "dx": "12 Ultimate", "ogl": "4.6", "vulk": "1.3", "ray": true, "up": "DLSS 2", "res": "7680×4320", "mon": 4, "brand": "NVIDIA"}, {"name": "GeForce RTX 3090 Ti", "chip": "GA102", "arch": "Ampere", "proc": "8 нм", "year": 2022, "perf": 58.0, "boost": 1860, "sh": 10752, "rt": 168, "tn": 336, "mem": 24, "mt": "GDDR6X", "memf": 21000, "bus": 384, "bw": 1008, "tgp": 450, "psu": 850, "pwr": "16-pin", "dx": "12 Ultimate", "ogl": "4.6", "vulk": "1.3", "ray": true, "up": "DLSS 2", "res": "7680×4320", "mon": 4, "brand": "NVIDIA"}, {"name": "GeForce RTX 4060", "chip": "AD107", "arch": "Ada Lovelace", "proc": "5 нм", "year": 2023, "perf": 25.0, "boost": 2460, "sh": 3072, "rt": 24, "tn": 96, "mem": 8, "mt": "GDDR6", "memf": 17000, "bus": 128, "bw": 272, "tgp": 115, "psu": 550, "pwr": "1×8-pin", "dx": "12 Ultimate", "ogl": "4.6", "vulk": "1.3", "ray": true, "up": "DLSS 3", "res": "7680×4320", "mon": 4, "brand": "NVIDIA"}, {"name": "GeForce RTX 4060 Ti 8GB", "chip": "AD106", "arch": "Ada Lovelace", "proc": "5 нм", "year": 2023, "perf": 30.0, "boost": 2535, "sh": 4352, "rt": 34, "tn": 136, "mem": 8, "mt": "GDDR6", "memf": 18000, "bus": 128, "bw": 288, "tgp": 160, "psu": 550, "pwr": "1×8-pin", "dx": "12 Ultimate", "ogl": "4.6", "vulk": "1.3", "ray": true, "up": "DLSS 3", "res": "7680×4320", "mon": 4, "brand": "NVIDIA"}, {"name": "GeForce RTX 4060 Ti 16GB", "chip": "AD106", "arch": "Ada Lovelace", "proc": "5 нм", "year": 2023, "perf": 30.5, "boost": 2535, "sh": 4352, "rt": 34, "tn": 136, "mem": 16, "mt": "GDDR6", "memf": 18000, "bus": 128, "bw": 288, "tgp": 165, "psu": 550, "pwr": "1×8-pin", "dx": "12 Ultimate", "ogl": "4.6", "vulk": "1.3", "ray": true, "up": "DLSS 3", "res": "7680×4320", "mon": 4, "brand": "NVIDIA"}, {"name": "GeForce RTX 4070", "chip": "AD104", "arch": "Ada Lovelace", "proc": "5 нм", "year": 2023, "perf": 42.0, "boost": 2475, "sh": 5888, "rt": 46, "tn": 184, "mem": 12, "mt": "GDDR6X", "memf": 21000, "bus": 192, "bw": 504, "tgp": 200, "psu": 650, "pwr": "1×8-pin", "dx": "12 Ultimate", "ogl": "4.6", "vulk": "1.3", "ray": true, "up": "DLSS 3", "res": "7680×4320", "mon": 4, "brand": "NVIDIA"}, {"name": "GeForce RTX 4070 Super", "chip": "AD104", "arch": "Ada Lovelace", "proc": "5 нм", "year": 2024, "perf": 47.0, "boost": 2475, "sh": 7168, "rt": 56, "tn": 224, "mem": 12, "mt": "GDDR6X", "memf": 21000, "bus": 192, "bw": 504, "tgp": 220, "psu": 650, "pwr": "1×16-pin", "dx": "12 Ultimate", "ogl": "4.6", "vulk": "1.3", "ray": true, "up": "DLSS 3", "res": "7680×4320", "mon": 4, "brand": "NVIDIA"}, {"name": "GeForce RTX 4070 Ti", "chip": "AD104", "arch": "Ada Lovelace", "proc": "5 нм", "year": 2023, "perf": 50.0, "boost": 2610, "sh": 7680, "rt": 60, "tn": 240, "mem": 12, "mt": "GDDR6X", "memf": 21000, "bus": 192, "bw": 504, "tgp": 285, "psu": 700, "pwr": "1×16-pin", "dx": "12 Ultimate", "ogl": "4.6", "vulk": "1.3", "ray": true, "up": "DLSS 3", "res": "7680×4320", "mon": 4, "brand": "NVIDIA"}, {"name": "GeForce RTX 4070 Ti Super", "chip": "AD103", "arch": "Ada Lovelace", "proc": "5 нм", "year": 2024, "perf": 56.0, "boost": 2610, "sh": 8448, "rt": 66, "tn": 264, "mem": 16, "mt": "GDDR6X", "memf": 21000, "bus": 256, "bw": 672, "tgp": 285, "psu": 700, "pwr": "1×16-pin", "dx": "12 Ultimate", "ogl": "4.6", "vulk": "1.3", "ray": true, "up": "DLSS 3", "res": "7680×4320", "mon": 4, "brand": "NVIDIA"}, {"name": "GeForce RTX 4080", "chip": "AD103", "arch": "Ada Lovelace", "proc": "5 нм", "year": 2022, "perf": 62.0, "boost": 2505, "sh": 9728, "rt": 76, "tn": 304, "mem": 16, "mt": "GDDR6X", "memf": 22000, "bus": 256, "bw": 717, "tgp": 320, "psu": 750, "pwr": "1×16-pin", "dx": "12 Ultimate", "ogl": "4.6", "vulk": "1.3", "ray": true, "up": "DLSS 3", "res": "7680×4320", "mon": 4, "brand": "NVIDIA"}, {"name": "GeForce RTX 4080 Super", "chip": "AD103", "arch": "Ada Lovelace", "proc": "5 нм", "year": 2024, "perf": 62.0, "boost": 2550, "sh": 10240, "rt": 80, "tn": 320, "mem": 16, "mt": "GDDR6X", "memf": 23000, "bus": 256, "bw": 736, "tgp": 320, "psu": 750, "pwr": "1×16-pin", "dx": "12 Ultimate", "ogl": "4.6", "vulk": "1.3", "ray": true, "up": "DLSS 3", "res": "7680×4320", "mon": 4, "brand": "NVIDIA"}, {"name": "GeForce RTX 4090", "chip": "AD102", "arch": "Ada Lovelace", "proc": "5 нм", "year": 2022, "perf": 82.0, "boost": 2520, "sh": 16384, "rt": 128, "tn": 512, "mem": 24, "mt": "GDDR6X", "memf": 21000, "bus": 384, "bw": 1008, "tgp": 450, "psu": 850, "pwr": "1×16-pin", "dx": "12 Ultimate", "ogl": "4.6", "vulk": "1.3", "ray": true, "up": "DLSS 3", "res": "7680×4320", "mon": 4, "brand": "NVIDIA"}, {"name": "GeForce RTX 5060", "chip": "GB206", "arch": "Blackwell", "proc": "4 нм", "year": 2025, "perf": 32.0, "boost": 2497, "sh": 3840, "rt": 30, "tn": 120, "mem": 8, "mt": "GDDR7", "memf": 28000, "bus": 128, "bw": 448, "tgp": 145, "psu": 550, "pwr": "1×8-pin", "dx": "12 Ultimate", "ogl": "4.6", "vulk": "1.4", "ray": true, "up": "DLSS 4", "res": "7680×4320", "mon": 4, "brand": "NVIDIA"}, {"name": "GeForce RTX 5060 Ti 8GB", "chip": "GB206", "arch": "Blackwell", "proc": "4 нм", "year": 2025, "perf": 38.0, "boost": 2572, "sh": 4608, "rt": 36, "tn": 144, "mem": 8, "mt": "GDDR7", "memf": 28000, "bus": 128, "bw": 448, "tgp": 180, "psu": 600, "pwr": "1×16-pin", "dx": "12 Ultimate", "ogl": "4.6", "vulk": "1.4", "ray": true, "up": "DLSS 4", "res": "7680×4320", "mon": 4, "brand": "NVIDIA"}, {"name": "GeForce RTX 5060 Ti 16GB", "chip": "GB206", "arch": "Blackwell", "proc": "4 нм", "year": 2025, "perf": 38.5, "boost": 2572, "sh": 4608, "rt": 36, "tn": 144, "mem": 16, "mt": "GDDR7", "memf": 28000, "bus": 128, "bw": 448, "tgp": 180, "psu": 600, "pwr": "1×16-pin", "dx": "12 Ultimate", "ogl": "4.6", "vulk": "1.4", "ray": true, "up": "DLSS 4", "res": "7680×4320", "mon": 4, "brand": "NVIDIA"}, {"name": "GeForce RTX 5070", "chip": "GB205", "arch": "Blackwell", "proc": "4 нм", "year": 2025, "perf": 55.0, "boost": 2512, "sh": 6144, "rt": 48, "tn": 192, "mem": 12, "mt": "GDDR7", "memf": 28000, "bus": 192, "bw": 672, "tgp": 250, "psu": 650, "pwr": "1×16-pin", "dx": "12 Ultimate", "ogl": "4.6", "vulk": "1.4", "ray": true, "up": "DLSS 4", "res": "7680×4320", "mon": 4, "brand": "NVIDIA"}, {"name": "GeForce RTX 5070 Ti", "chip": "GB203", "arch": "Blackwell", "proc": "4 нм", "year": 2025, "perf": 66.0, "boost": 2452, "sh": 8960, "rt": 70, "tn": 280, "mem": 16, "mt": "GDDR7", "memf": 28000, "bus": 256, "bw": 896, "tgp": 300, "psu": 750, "pwr": "1×16-pin", "dx": "12 Ultimate", "ogl": "4.6", "vulk": "1.4", "ray": true, "up": "DLSS 4", "res": "7680×4320", "mon": 4, "brand": "NVIDIA"}, {"name": "GeForce RTX 5080", "chip": "GB203", "arch": "Blackwell", "proc": "4 нм", "year": 2025, "perf": 78.0, "boost": 2617, "sh": 10752, "rt": 84, "tn": 336, "mem": 16, "mt": "GDDR7", "memf": 30000, "bus": 256, "bw": 960, "tgp": 360, "psu": 850, "pwr": "1×16-pin", "dx": "12 Ultimate", "ogl": "4.6", "vulk": "1.4", "ray": true, "up": "DLSS 4", "res": "7680×4320", "mon": 4, "brand": "NVIDIA"}, {"name": "GeForce RTX 5090", "chip": "GB202", "arch": "Blackwell", "proc": "4 нм", "year": 2025, "perf": 100.0, "boost": 2407, "sh": 21760, "rt": 170, "tn": 680, "mem": 32, "mt": "GDDR7", "memf": 28000, "bus": 512, "bw": 1792, "tgp": 575, "psu": 1000, "pwr": "1×16-pin", "dx": "12 Ultimate", "ogl": "4.6", "vulk": "1.4", "ray": true, "up": "DLSS 4", "res": "7680×4320", "mon": 4, "brand": "NVIDIA"}, {"name": "Radeon X1900 XTX", "chip": "R580", "arch": "TeraScale", "proc": "90 нм", "year": 2006, "perf": 1.3, "boost": 650, "sh": 48, "rt": 0, "tn": 0, "mem": 0.512, "mt": "GDDR3", "memf": 1550, "bus": 256, "bw": 49.6, "tgp": 105, "psu": 450, "pwr": "—", "dx": "9.0c", "ogl": "2.0", "vulk": "—", "ray": false, "up": "—", "res": "2560×1600", "mon": 2, "brand": "AMD"}, {"name": "Radeon X1950 XTX", "chip": "R580", "arch": "TeraScale", "proc": "90 нм", "year": 2006, "perf": 1.4, "boost": 650, "sh": 48, "rt": 0, "tn": 0, "mem": 0.512, "mt": "GDDR3", "memf": 2000, "bus": 256, "bw": 64, "tgp": 116, "psu": 450, "pwr": "—", "dx": "9.0c", "ogl": "2.0", "vulk": "—", "ray": false, "up": "—", "res": "2560×1600", "mon": 2, "brand": "AMD"}, {"name": "Radeon HD 2900 XT", "chip": "R600", "arch": "TeraScale", "proc": "80 нм", "year": 2007, "perf": 2.2, "boost": 743, "sh": 320, "rt": 0, "tn": 0, "mem": 0.512, "mt": "GDDR3", "memf": 1650, "bus": 512, "bw": 105.6, "tgp": 215, "psu": 550, "pwr": "2×6-pin", "dx": "10", "ogl": "2.1", "vulk": "—", "ray": false, "up": "—", "res": "2560×1600", "mon": 2, "brand": "AMD"}, {"name": "Radeon HD 3870", "chip": "RV670", "arch": "TeraScale", "proc": "55 нм", "year": 2007, "perf": 2.4, "boost": 775, "sh": 320, "rt": 0, "tn": 0, "mem": 0.512, "mt": "GDDR4", "memf": 2250, "bus": 256, "bw": 72, "tgp": 106, "psu": 400, "pwr": "1×6-pin", "dx": "10.1", "ogl": "2.1", "vulk": "—", "ray": false, "up": "—", "res": "2560×1600", "mon": 2, "brand": "AMD"}, {"name": "Radeon HD 4670", "chip": "RV730", "arch": "TeraScale", "proc": "55 нм", "year": 2008, "perf": 2.2, "boost": 750, "sh": 320, "rt": 0, "tn": 0, "mem": 1, "mt": "GDDR3", "memf": 2000, "bus": 128, "bw": 32, "tgp": 60, "psu": 350, "pwr": "—", "dx": "10.1", "ogl": "2.1", "vulk": "—", "ray": false, "up": "—", "res": "2560×1600", "mon": 2, "brand": "AMD"}, {"name": "Radeon HD 4770", "chip": "RV740", "arch": "TeraScale", "proc": "40 нм", "year": 2009, "perf": 3.5, "boost": 750, "sh": 640, "rt": 0, "tn": 0, "mem": 0.512, "mt": "GDDR5", "memf": 3600, "bus": 128, "bw": 57.6, "tgp": 80, "psu": 400, "pwr": "1×6-pin", "dx": "10.1", "ogl": "2.1", "vulk": "—", "ray": false, "up": "—", "res": "2560×1600", "mon": 2, "brand": "AMD"}, {"name": "Radeon HD 4850", "chip": "RV770", "arch": "TeraScale", "proc": "55 нм", "year": 2008, "perf": 3.9, "boost": 625, "sh": 800, "rt": 0, "tn": 0, "mem": 0.512, "mt": "GDDR3", "memf": 1986, "bus": 256, "bw": 63.6, "tgp": 110, "psu": 450, "pwr": "1×6-pin", "dx": "10.1", "ogl": "2.1", "vulk": "—", "ray": false, "up": "—", "res": "2560×1600", "mon": 2, "brand": "AMD"}, {"name": "Radeon HD 4870", "chip": "RV770", "arch": "TeraScale", "proc": "55 нм", "year": 2008, "perf": 4.4, "boost": 750, "sh": 800, "rt": 0, "tn": 0, "mem": 0.512, "mt": "GDDR5", "memf": 3600, "bus": 256, "bw": 115.2, "tgp": 130, "psu": 500, "pwr": "2×6-pin", "dx": "10.1", "ogl": "2.1", "vulk": "—", "ray": false, "up": "—", "res": "2560×1600", "mon": 2, "brand": "AMD"}, {"name": "Radeon HD 4890", "chip": "RV790", "arch": "TeraScale", "proc": "55 нм", "year": 2009, "perf": 4.7, "boost": 850, "sh": 800, "rt": 0, "tn": 0, "mem": 1, "mt": "GDDR5", "memf": 3900, "bus": 256, "bw": 124.8, "tgp": 137, "psu": 500, "pwr": "2×6-pin", "dx": "10.1", "ogl": "2.1", "vulk": "—", "ray": false, "up": "—", "res": "2560×1600", "mon": 2, "brand": "AMD"}, {"name": "Radeon HD 4870 X2", "chip": "2×RV770", "arch": "TeraScale", "proc": "55 нм", "year": 2008, "perf": 7.8, "boost": 750, "sh": 1600, "rt": 0, "tn": 0, "mem": 2, "mt": "GDDR5", "memf": 3600, "bus": 512, "bw": 230.4, "tgp": 286, "psu": 850, "pwr": "2×8-pin", "dx": "10.1", "ogl": "2.1", "vulk": "—", "ray": false, "up": "—", "res": "2560×1600", "mon": 4, "brand": "AMD"}, {"name": "Radeon HD 5750", "chip": "Juniper", "arch": "TeraScale 2", "proc": "40 нм", "year": 2009, "perf": 3.4, "boost": 700, "sh": 720, "rt": 0, "tn": 0, "mem": 1, "mt": "GDDR5", "memf": 4600, "bus": 128, "bw": 73.6, "tgp": 86, "psu": 400, "pwr": "1×6-pin", "dx": "11", "ogl": "3.2", "vulk": "—", "ray": false, "up": "—", "res": "2560×1600", "mon": 4, "brand": "AMD"}, {"name": "Radeon HD 5770", "chip": "Juniper", "arch": "TeraScale 2", "proc": "40 нм", "year": 2009, "perf": 4.0, "boost": 850, "sh": 800, "rt": 0, "tn": 0, "mem": 1, "mt": "GDDR5", "memf": 4800, "bus": 128, "bw": 76.8, "tgp": 108, "psu": 450, "pwr": "1×6-pin", "dx": "11", "ogl": "3.2", "vulk": "—", "ray": false, "up": "—", "res": "2560×1600", "mon": 4, "brand": "AMD"}, {"name": "Radeon HD 5830", "chip": "Cypress", "arch": "TeraScale 2", "proc": "40 нм", "year": 2010, "perf": 5.0, "boost": 800, "sh": 1120, "rt": 0, "tn": 0, "mem": 1, "mt": "GDDR5", "memf": 4000, "bus": 256, "bw": 128, "tgp": 150, "psu": 500, "pwr": "2×6-pin", "dx": "11", "ogl": "3.2", "vulk": "—", "ray": false, "up": "—", "res": "2560×1600", "mon": 4, "brand": "AMD"}, {"name": "Radeon HD 5850", "chip": "Cypress", "arch": "TeraScale 2", "proc": "40 нм", "year": 2009, "perf": 5.8, "boost": 725, "sh": 1440, "rt": 0, "tn": 0, "mem": 1, "mt": "GDDR5", "memf": 4000, "bus": 256, "bw": 128, "tgp": 151, "psu": 500, "pwr": "2×6-pin", "dx": "11", "ogl": "3.2", "vulk": "—", "ray": false, "up": "—", "res": "2560×1600", "mon": 4, "brand": "AMD"}, {"name": "Radeon HD 5870", "chip": "Cypress", "arch": "TeraScale 2", "proc": "40 нм", "year": 2009, "perf": 6.6, "boost": 850, "sh": 1600, "rt": 0, "tn": 0, "mem": 1, "mt": "GDDR5", "memf": 4800, "bus": 256, "bw": 153.6, "tgp": 188, "psu": 550, "pwr": "2×6-pin", "dx": "11", "ogl": "3.2", "vulk": "—", "ray": false, "up": "—", "res": "2560×1600", "mon": 4, "brand": "AMD"}, {"name": "Radeon HD 5970", "chip": "2×Cypress", "arch": "TeraScale 2", "proc": "40 нм", "year": 2009, "perf": 12.0, "boost": 725, "sh": 3200, "rt": 0, "tn": 0, "mem": 2, "mt": "GDDR5", "memf": 4000, "bus": 512, "bw": 256, "tgp": 294, "psu": 850, "pwr": "2×8-pin", "dx": "11", "ogl": "3.2", "vulk": "—", "ray": false, "up": "—", "res": "2560×1600", "mon": 4, "brand": "AMD"}, {"name": "Radeon HD 6670", "chip": "Turks", "arch": "TeraScale 2", "proc": "40 нм", "year": 2011, "perf": 1.7, "boost": 800, "sh": 480, "rt": 0, "tn": 0, "mem": 1, "mt": "GDDR5", "memf": 4000, "bus": 128, "bw": 64, "tgp": 66, "psu": 350, "pwr": "—", "dx": "11", "ogl": "3.2", "vulk": "—", "ray": false, "up": "—", "res": "2560×1600", "mon": 4, "brand": "AMD"}, {"name": "Radeon HD 6750", "chip": "Juniper", "arch": "TeraScale 2", "proc": "40 нм", "year": 2011, "perf": 3.3, "boost": 700, "sh": 720, "rt": 0, "tn": 0, "mem": 1, "mt": "GDDR5", "memf": 4600, "bus": 128, "bw": 73.6, "tgp": 86, "psu": 400, "pwr": "1×6-pin", "dx": "11", "ogl": "3.2", "vulk": "—", "ray": false, "up": "—", "res": "2560×1600", "mon": 4, "brand": "AMD"}, {"name": "Radeon HD 6770", "chip": "Juniper", "arch": "TeraScale 2", "proc": "40 нм", "year": 2011, "perf": 4.0, "boost": 850, "sh": 800, "rt": 0, "tn": 0, "mem": 1, "mt": "GDDR5", "memf": 4800, "bus": 128, "bw": 76.8, "tgp": 108, "psu": 450, "pwr": "1×6-pin", "dx": "11", "ogl": "3.2", "vulk": "—", "ray": false, "up": "—", "res": "2560×1600", "mon": 4, "brand": "AMD"}, {"name": "Radeon HD 6790", "chip": "Barts", "arch": "TeraScale 2", "proc": "40 нм", "year": 2011, "perf": 4.2, "boost": 840, "sh": 800, "rt": 0, "tn": 0, "mem": 1, "mt": "GDDR5", "memf": 4200, "bus": 256, "bw": 134.4, "tgp": 150, "psu": 500, "pwr": "2×6-pin", "dx": "11", "ogl": "3.2", "vulk": "—", "ray": false, "up": "—", "res": "2560×1600", "mon": 4, "brand": "AMD"}, {"name": "Radeon HD 6850", "chip": "Barts", "arch": "TeraScale 2", "proc": "40 нм", "year": 2010, "perf": 4.8, "boost": 775, "sh": 960, "rt": 0, "tn": 0, "mem": 1, "mt": "GDDR5", "memf": 4000, "bus": 256, "bw": 128, "tgp": 127, "psu": 500, "pwr": "2×6-pin", "dx": "11", "ogl": "3.2", "vulk": "—", "ray": false, "up": "—", "res": "2560×1600", "mon": 4, "brand": "AMD"}, {"name": "Radeon HD 6870", "chip": "Barts", "arch": "TeraScale 2", "proc": "40 нм", "year": 2010, "perf": 5.6, "boost": 900, "sh": 1120, "rt": 0, "tn": 0, "mem": 1, "mt": "GDDR5", "memf": 4200, "bus": 256, "bw": 134.4, "tgp": 151, "psu": 500, "pwr": "2×6-pin", "dx": "11", "ogl": "3.2", "vulk": "—", "ray": false, "up": "—", "res": "2560×1600", "mon": 4, "brand": "AMD"}, {"name": "Radeon HD 6950", "chip": "Cayman", "arch": "TeraScale 2", "proc": "40 нм", "year": 2010, "perf": 9.0, "boost": 800, "sh": 1408, "rt": 0, "tn": 0, "mem": 2, "mt": "GDDR5", "memf": 5000, "bus": 256, "bw": 128, "tgp": 200, "psu": 550, "pwr": "2×6-pin", "dx": "11", "ogl": "3.2", "vulk": "—", "ray": false, "up": "—", "res": "2560×1600", "mon": 4, "brand": "AMD"}, {"name": "Radeon HD 6970", "chip": "Cayman", "arch": "TeraScale 2", "proc": "40 нм", "year": 2010, "perf": 10.5, "boost": 880, "sh": 1536, "rt": 0, "tn": 0, "mem": 2, "mt": "GDDR5", "memf": 5500, "bus": 256, "bw": 176, "tgp": 250, "psu": 600, "pwr": "2×8-pin", "dx": "11", "ogl": "3.2", "vulk": "—", "ray": false, "up": "—", "res": "2560×1600", "mon": 4, "brand": "AMD"}, {"name": "Radeon HD 6990", "chip": "2×Cayman", "arch": "TeraScale 2", "proc": "40 нм", "year": 2011, "perf": 19.0, "boost": 830, "sh": 3072, "rt": 0, "tn": 0, "mem": 4, "mt": "GDDR5", "memf": 5000, "bus": 512, "bw": 256, "tgp": 375, "psu": 900, "pwr": "2×8-pin", "dx": "11", "ogl": "3.2", "vulk": "—", "ray": false, "up": "—", "res": "2560×1600", "mon": 4, "brand": "AMD"}, {"name": "Radeon HD 7750", "chip": "Cape Verde", "arch": "GCN 1.0", "proc": "28 нм", "year": 2012, "perf": 2.6, "boost": 900, "sh": 512, "rt": 0, "tn": 0, "mem": 1, "mt": "GDDR5", "memf": 4500, "bus": 128, "bw": 57.6, "tgp": 55, "psu": 350, "pwr": "—", "dx": "11.1", "ogl": "4.2", "vulk": "1.2", "ray": false, "up": "—", "res": "2560×1600", "mon": 4, "brand": "AMD"}, {"name": "Radeon HD 7770", "chip": "Cape Verde", "arch": "GCN 1.0", "proc": "28 нм", "year": 2012, "perf": 3.6, "boost": 1000, "sh": 640, "rt": 0, "tn": 0, "mem": 1, "mt": "GDDR5", "memf": 4500, "bus": 128, "bw": 72, "tgp": 80, "psu": 400, "pwr": "1×6-pin", "dx": "11.1", "ogl": "4.2", "vulk": "1.2", "ray": false, "up": "—", "res": "2560×1600", "mon": 4, "brand": "AMD"}, {"name": "Radeon HD 7850", "chip": "Pitcairn", "arch": "GCN 1.0", "proc": "28 нм", "year": 2012, "perf": 5.8, "boost": 860, "sh": 1024, "rt": 0, "tn": 0, "mem": 2, "mt": "GDDR5", "memf": 4800, "bus": 256, "bw": 153.6, "tgp": 130, "psu": 500, "pwr": "1×8-pin", "dx": "11.1", "ogl": "4.2", "vulk": "1.2", "ray": false, "up": "—", "res": "2560×1600", "mon": 4, "brand": "AMD"}, {"name": "Radeon HD 7870", "chip": "Pitcairn", "arch": "GCN 1.0", "proc": "28 нм", "year": 2012, "perf": 6.6, "boost": 1000, "sh": 1280, "rt": 0, "tn": 0, "mem": 2, "mt": "GDDR5", "memf": 4800, "bus": 256, "bw": 153.6, "tgp": 175, "psu": 500, "pwr": "2×6-pin", "dx": "11.1", "ogl": "4.2", "vulk": "1.2", "ray": false, "up": "—", "res": "2560×1600", "mon": 4, "brand": "AMD"}, {"name": "Radeon HD 7950", "chip": "Tahiti", "arch": "GCN 1.0", "proc": "28 нм", "year": 2012, "perf": 9.2, "boost": 800, "sh": 1792, "rt": 0, "tn": 0, "mem": 3, "mt": "GDDR5", "memf": 5000, "bus": 384, "bw": 240, "tgp": 200, "psu": 550, "pwr": "1×8+1×6-pin", "dx": "11.1", "ogl": "4.2", "vulk": "1.2", "ray": false, "up": "—", "res": "2560×1600", "mon": 4, "brand": "AMD"}, {"name": "Radeon HD 7970", "chip": "Tahiti", "arch": "GCN 1.0", "proc": "28 нм", "year": 2012, "perf": 11.0, "boost": 925, "sh": 2048, "rt": 0, "tn": 0, "mem": 3, "mt": "GDDR5", "memf": 5500, "bus": 384, "bw": 264, "tgp": 250, "psu": 600, "pwr": "1×8+1×6-pin", "dx": "11.1", "ogl": "4.2", "vulk": "1.2", "ray": false, "up": "—", "res": "2560×1600", "mon": 4, "brand": "AMD"}, {"name": "Radeon HD 7990", "chip": "2×Tahiti", "arch": "GCN 1.0", "proc": "28 нм", "year": 2013, "perf": 21.0, "boost": 950, "sh": 4096, "rt": 0, "tn": 0, "mem": 6, "mt": "GDDR5", "memf": 6000, "bus": 768, "bw": 576, "tgp": 375, "psu": 850, "pwr": "2×8-pin", "dx": "11.1", "ogl": "4.2", "vulk": "1.2", "ray": false, "up": "—", "res": "4096×2160", "mon": 4, "brand": "AMD"}, {"name": "Radeon R9 270", "chip": "Curacao", "arch": "GCN 1.0", "proc": "28 нм", "year": 2013, "perf": 7.0, "boost": 925, "sh": 1280, "rt": 0, "tn": 0, "mem": 2, "mt": "GDDR5", "memf": 5600, "bus": 256, "bw": 179.2, "tgp": 150, "psu": 500, "pwr": "1×8-pin", "dx": "11.2", "ogl": "4.3", "vulk": "1.2", "ray": false, "up": "—", "res": "2560×1600", "mon": 4, "brand": "AMD"}, {"name": "Radeon R9 270X", "chip": "Curacao", "arch": "GCN 1.0", "proc": "28 нм", "year": 2013, "perf": 7.5, "boost": 1000, "sh": 1280, "rt": 0, "tn": 0, "mem": 2, "mt": "GDDR5", "memf": 6000, "bus": 256, "bw": 192, "tgp": 180, "psu": 500, "pwr": "2×6-pin", "dx": "11.2", "ogl": "4.3", "vulk": "1.2", "ray": false, "up": "—", "res": "2560×1600", "mon": 4, "brand": "AMD"}, {"name": "Radeon R9 280", "chip": "Tahiti", "arch": "GCN 1.0", "proc": "28 нм", "year": 2014, "perf": 9.4, "boost": 860, "sh": 1792, "rt": 0, "tn": 0, "mem": 3, "mt": "GDDR5", "memf": 5000, "bus": 384, "bw": 240, "tgp": 200, "psu": 550, "pwr": "1×8+1×6-pin", "dx": "11.2", "ogl": "4.3", "vulk": "1.2", "ray": false, "up": "—", "res": "2560×1600", "mon": 4, "brand": "AMD"}, {"name": "Radeon R9 280X", "chip": "Tahiti", "arch": "GCN 1.0", "proc": "28 нм", "year": 2013, "perf": 10.5, "boost": 1000, "sh": 2048, "rt": 0, "tn": 0, "mem": 3, "mt": "GDDR5", "memf": 6000, "bus": 384, "bw": 264, "tgp": 250, "psu": 600, "pwr": "2×6-pin", "dx": "11.2", "ogl": "4.3", "vulk": "1.2", "ray": false, "up": "—", "res": "2560×1600", "mon": 4, "brand": "AMD"}, {"name": "Radeon R9 290", "chip": "Hawaii", "arch": "GCN 1.1", "proc": "28 нм", "year": 2013, "perf": 13.0, "boost": 947, "sh": 2560, "rt": 0, "tn": 0, "mem": 4, "mt": "GDDR5", "memf": 5000, "bus": 512, "bw": 320, "tgp": 275, "psu": 650, "pwr": "1×8+1×6-pin", "dx": "11.2", "ogl": "4.3", "vulk": "1.2", "ray": false, "up": "—", "res": "2560×1600", "mon": 4, "brand": "AMD"}, {"name": "Radeon R9 290X", "chip": "Hawaii", "arch": "GCN 1.1", "proc": "28 нм", "year": 2013, "perf": 14.5, "boost": 1000, "sh": 2816, "rt": 0, "tn": 0, "mem": 4, "mt": "GDDR5", "memf": 5000, "bus": 512, "bw": 320, "tgp": 290, "psu": 650, "pwr": "1×8+1×6-pin", "dx": "11.2", "ogl": "4.3", "vulk": "1.2", "ray": false, "up": "—", "res": "2560×1600", "mon": 4, "brand": "AMD"}, {"name": "Radeon R9 295X2", "chip": "2×Hawaii", "arch": "GCN 1.1", "proc": "28 нм", "year": 2014, "perf": 25.0, "boost": 1018, "sh": 5632, "rt": 0, "tn": 0, "mem": 8, "mt": "GDDR5", "memf": 5000, "bus": 1024, "bw": 640, "tgp": 500, "psu": 1000, "pwr": "2×8-pin", "dx": "11.2", "ogl": "4.3", "vulk": "1.2", "ray": false, "up": "—", "res": "2560×1600", "mon": 4, "brand": "AMD"}, {"name": "Radeon R9 370", "chip": "Trinidad", "arch": "GCN 1.2", "proc": "28 нм", "year": 2015, "perf": 6.5, "boost": 975, "sh": 1024, "rt": 0, "tn": 0, "mem": 2, "mt": "GDDR5", "memf": 5600, "bus": 256, "bw": 179.2, "tgp": 110, "psu": 400, "pwr": "1×8-pin", "dx": "11.2", "ogl": "4.3", "vulk": "1.2", "ray": false, "up": "—", "res": "2560×1600", "mon": 4, "brand": "AMD"}, {"name": "Radeon R9 380", "chip": "Antigua", "arch": "GCN 1.2", "proc": "28 нм", "year": 2015, "perf": 8.5, "boost": 925, "sh": 1792, "rt": 0, "tn": 0, "mem": 2, "mt": "GDDR5", "memf": 6000, "bus": 256, "bw": 182.4, "tgp": 190, "psu": 500, "pwr": "2×8-pin", "dx": "11.2", "ogl": "4.3", "vulk": "1.2", "ray": false, "up": "—", "res": "2560×1600", "mon": 4, "brand": "AMD"}, {"name": "Radeon R9 390", "chip": "Grenada", "arch": "GCN 1.1", "proc": "28 нм", "year": 2015, "perf": 13.5, "boost": 1000, "sh": 2560, "rt": 0, "tn": 0, "mem": 8, "mt": "GDDR5", "memf": 6000, "bus": 512, "bw": 384, "tgp": 275, "psu": 750, "pwr": "1×8+1×6-pin", "dx": "11.2", "ogl": "4.3", "vulk": "1.2", "ray": false, "up": "—", "res": "2560×1600", "mon": 4, "brand": "AMD"}, {"name": "Radeon R9 390X", "chip": "Grenada", "arch": "GCN 1.1", "proc": "28 нм", "year": 2015, "perf": 15.0, "boost": 1050, "sh": 2816, "rt": 0, "tn": 0, "mem": 8, "mt": "GDDR5", "memf": 6000, "bus": 512, "bw": 384, "tgp": 275, "psu": 750, "pwr": "1×8+1×6-pin", "dx": "11.2", "ogl": "4.3", "vulk": "1.2", "ray": false, "up": "—", "res": "2560×1600", "mon": 4, "brand": "AMD"}, {"name": "Radeon R9 Fury X", "chip": "Fiji", "arch": "GCN 1.3", "proc": "28 нм", "year": 2015, "perf": 17.0, "boost": 1050, "sh": 4096, "rt": 64, "tn": 256, "mem": 4, "mt": "HBM", "memf": 500, "bus": 4096, "bw": 512, "tgp": 275, "psu": 750, "pwr": "2×8-pin", "dx": "11.2", "ogl": "4.3", "vulk": "1.2", "ray": false, "up": "—", "res": "4096×2160", "mon": 4, "brand": "AMD"}, {"name": "Radeon R9 Fury", "chip": "Fiji", "arch": "GCN 1.3", "proc": "28 нм", "year": 2015, "perf": 15.0, "boost": 1000, "sh": 3584, "rt": 56, "tn": 224, "mem": 4, "mt": "HBM", "memf": 500, "bus": 4096, "bw": 512, "tgp": 275, "psu": 750, "pwr": "2×8-pin", "dx": "11.2", "ogl": "4.3", "vulk": "1.2", "ray": false, "up": "—", "res": "4096×2160", "mon": 4, "brand": "AMD"}, {"name": "Radeon Pro Duo", "chip": "2×Fiji", "arch": "GCN 1.3", "proc": "28 нм", "year": 2016, "perf": 29.0, "boost": 1000, "sh": 8192, "rt": 128, "tn": 512, "mem": 8, "mt": "HBM", "memf": 500, "bus": 8192, "bw": 1024, "tgp": 350, "psu": 1000, "pwr": "3×8-pin", "dx": "11.2", "ogl": "4.3", "vulk": "1.2", "ray": false, "up": "—", "res": "4096×2160", "mon": 4, "brand": "AMD"}, {"name": "Radeon RX 460", "chip": "Baffin", "arch": "GCN 4", "proc": "14 нм", "year": 2016, "perf": 4.6, "boost": 1200, "sh": 896, "rt": 0, "tn": 0, "mem": 2, "mt": "GDDR5", "memf": 7000, "bus": 128, "bw": 112, "tgp": 60, "psu": 400, "pwr": "—", "dx": "12", "ogl": "4.5", "vulk": "1.2", "ray": false, "up": "—", "res": "4096×2160", "mon": 4, "brand": "AMD"}, {"name": "Radeon RX 470", "chip": "Ellesmere", "arch": "GCN 4", "proc": "14 нм", "year": 2016, "perf": 7.0, "boost": 1206, "sh": 1792, "rt": 0, "tn": 0, "mem": 4, "mt": "GDDR5", "memf": 6600, "bus": 256, "bw": 211.2, "tgp": 120, "psu": 450, "pwr": "1×8-pin", "dx": "12", "ogl": "4.5", "vulk": "1.2", "ray": false, "up": "—", "res": "4096×2160", "mon": 4, "brand": "AMD"}, {"name": "Radeon RX 480", "chip": "Ellesmere", "arch": "GCN 4", "proc": "14 нм", "year": 2016, "perf": 8.0, "boost": 1266, "sh": 2304, "rt": 0, "tn": 0, "mem": 8, "mt": "GDDR5", "memf": 7000, "bus": 256, "bw": 224, "tgp": 150, "psu": 500, "pwr": "1×8-pin", "dx": "12", "ogl": "4.5", "vulk": "1.2", "ray": false, "up": "—", "res": "4096×2160", "mon": 4, "brand": "AMD"}, {"name": "Radeon RX 550", "chip": "Polaris 12", "arch": "GCN 4", "proc": "14 нм", "year": 2017, "perf": 2.3, "boost": 1183, "sh": 640, "rt": 0, "tn": 0, "mem": 2, "mt": "GDDR5", "memf": 7000, "bus": 128, "bw": 112, "tgp": 50, "psu": 300, "pwr": "—", "dx": "12", "ogl": "4.5", "vulk": "1.2", "ray": false, "up": "—", "res": "4096×2160", "mon": 4, "brand": "AMD"}, {"name": "Radeon RX 560", "chip": "Baffin", "arch": "GCN 4", "proc": "14 нм", "year": 2017, "perf": 5.2, "boost": 1275, "sh": 1024, "rt": 0, "tn": 0, "mem": 4, "mt": "GDDR5", "memf": 7000, "bus": 128, "bw": 112, "tgp": 80, "psu": 400, "pwr": "—", "dx": "12", "ogl": "4.5", "vulk": "1.2", "ray": false, "up": "—", "res": "4096×2160", "mon": 4, "brand": "AMD"}, {"name": "Radeon RX 570", "chip": "Ellesmere", "arch": "GCN 4", "proc": "14 нм", "year": 2017, "perf": 7.4, "boost": 1244, "sh": 2304, "rt": 0, "tn": 0, "mem": 4, "mt": "GDDR5", "memf": 7000, "bus": 256, "bw": 224, "tgp": 150, "psu": 500, "pwr": "1×8-pin", "dx": "12", "ogl": "4.5", "vulk": "1.2", "ray": false, "up": "—", "res": "4096×2160", "mon": 4, "brand": "AMD"}, {"name": "Radeon RX 580", "chip": "Ellesmere", "arch": "GCN 4", "proc": "14 нм", "year": 2017, "perf": 8.2, "boost": 1340, "sh": 2304, "rt": 0, "tn": 0, "mem": 8, "mt": "GDDR5", "memf": 7000, "bus": 256, "bw": 224, "tgp": 185, "psu": 500, "pwr": "1×8-pin", "dx": "12", "ogl": "4.5", "vulk": "1.2", "ray": false, "up": "—", "res": "4096×2160", "mon": 4, "brand": "AMD"}, {"name": "Radeon RX 590", "chip": "Polaris 30", "arch": "GCN 4", "proc": "12 нм", "year": 2018, "perf": 8.8, "boost": 1545, "sh": 2304, "rt": 0, "tn": 0, "mem": 8, "mt": "GDDR5", "memf": 8000, "bus": 256, "bw": 256, "tgp": 175, "psu": 550, "pwr": "1×8-pin", "dx": "12", "ogl": "4.5", "vulk": "1.2", "ray": false, "up": "—", "res": "4096×2160", "mon": 4, "brand": "AMD"}, {"name": "Radeon RX Vega 56", "chip": "Vega 10", "arch": "GCN 5", "proc": "14 нм", "year": 2017, "perf": 18.0, "boost": 1471, "sh": 3584, "rt": 56, "tn": 224, "mem": 8, "mt": "HBM2", "memf": 800, "bus": 2048, "bw": 410, "tgp": 210, "psu": 600, "pwr": "2×8-pin", "dx": "12", "ogl": "4.5", "vulk": "1.2", "ray": false, "up": "—", "res": "7680×4320", "mon": 4, "brand": "AMD"}, {"name": "Radeon RX Vega 64", "chip": "Vega 10", "arch": "GCN 5", "proc": "14 нм", "year": 2017, "perf": 20.0, "boost": 1546, "sh": 4096, "rt": 64, "tn": 256, "mem": 8, "mt": "HBM2", "memf": 945, "bus": 2048, "bw": 484, "tgp": 295, "psu": 650, "pwr": "2×8-pin", "dx": "12", "ogl": "4.5", "vulk": "1.2", "ray": false, "up": "—", "res": "7680×4320", "mon": 4, "brand": "AMD"}, {"name": "Radeon VII", "chip": "Vega 20", "arch": "GCN 5", "proc": "7 нм", "year": 2019, "perf": 26.5, "boost": 1800, "sh": 3840, "rt": 60, "tn": 240, "mem": 16, "mt": "HBM2", "memf": 1000, "bus": 4096, "bw": 1024, "tgp": 300, "psu": 750, "pwr": "2×8-pin", "dx": "12", "ogl": "4.6", "vulk": "1.2", "ray": false, "up": "—", "res": "7680×4320", "mon": 4, "brand": "AMD"}, {"name": "Radeon RX 5500 XT", "chip": "Navi 14", "arch": "RDNA", "proc": "7 нм", "year": 2019, "perf": 10.0, "boost": 1845, "sh": 1408, "rt": 22, "tn": 88, "mem": 4, "mt": "GDDR6", "memf": 14000, "bus": 128, "bw": 224, "tgp": 130, "psu": 450, "pwr": "1×8-pin", "dx": "12", "ogl": "4.6", "vulk": "1.2", "ray": false, "up": "—", "res": "7680×4320", "mon": 4, "brand": "AMD"}, {"name": "Radeon RX 5600 XT", "chip": "Navi 10", "arch": "RDNA", "proc": "7 нм", "year": 2020, "perf": 15.5, "boost": 1750, "sh": 2304, "rt": 36, "tn": 144, "mem": 6, "mt": "GDDR6", "memf": 14000, "bus": 192, "bw": 392, "tgp": 150, "psu": 500, "pwr": "1×8-pin", "dx": "12", "ogl": "4.6", "vulk": "1.2", "ray": false, "up": "—", "res": "7680×4320", "mon": 4, "brand": "AMD"}, {"name": "Radeon RX 5700", "chip": "Navi 10", "arch": "RDNA", "proc": "7 нм", "year": 2019, "perf": 19.5, "boost": 1725, "sh": 2304, "rt": 36, "tn": 144, "mem": 8, "mt": "GDDR6", "memf": 14000, "bus": 256, "bw": 448, "tgp": 180, "psu": 550, "pwr": "1×8-pin", "dx": "12", "ogl": "4.6", "vulk": "1.2", "ray": false, "up": "—", "res": "7680×4320", "mon": 4, "brand": "AMD"}, {"name": "Radeon RX 5700 XT", "chip": "Navi 10", "arch": "RDNA", "proc": "7 нм", "year": 2019, "perf": 21.5, "boost": 1905, "sh": 2560, "rt": 40, "tn": 160, "mem": 8, "mt": "GDDR6", "memf": 14000, "bus": 256, "bw": 448, "tgp": 225, "psu": 600, "pwr": "1×8+1×6-pin", "dx": "12", "ogl": "4.6", "vulk": "1.2", "ray": false, "up": "—", "res": "7680×4320", "mon": 4, "brand": "AMD"}, {"name": "Radeon RX 6400", "chip": "Navi 24", "arch": "RDNA 2", "proc": "6 нм", "year": 2022, "perf": 5.5, "boost": 2039, "sh": 768, "rt": 12, "tn": 24, "mem": 4, "mt": "GDDR6", "memf": 16000, "bus": 64, "bw": 112, "tgp": 53, "psu": 300, "pwr": "—", "dx": "12 Ultimate", "ogl": "4.6", "vulk": "1.3", "ray": true, "up": "FSR 2", "res": "7680×4320", "mon": 4, "brand": "AMD"}, {"name": "Radeon RX 6500 XT", "chip": "Navi 24", "arch": "RDNA 2", "proc": "6 нм", "year": 2022, "perf": 8.5, "boost": 2825, "sh": 1024, "rt": 16, "tn": 32, "mem": 4, "mt": "GDDR6", "memf": 18000, "bus": 64, "bw": 128, "tgp": 107, "psu": 400, "pwr": "1×6-pin", "dx": "12 Ultimate", "ogl": "4.6", "vulk": "1.3", "ray": true, "up": "FSR 2", "res": "7680×4320", "mon": 4, "brand": "AMD"}, {"name": "Radeon RX 6600", "chip": "Navi 23", "arch": "RDNA 2", "proc": "7 нм", "year": 2021, "perf": 14.5, "boost": 2491, "sh": 1792, "rt": 28, "tn": 56, "mem": 8, "mt": "GDDR6", "memf": 14000, "bus": 128, "bw": 224, "tgp": 132, "psu": 450, "pwr": "1×8-pin", "dx": "12 Ultimate", "ogl": "4.6", "vulk": "1.3", "ray": true, "up": "FSR 2", "res": "7680×4320", "mon": 4, "brand": "AMD"}, {"name": "Radeon RX 6600 XT", "chip": "Navi 23", "arch": "RDNA 2", "proc": "7 нм", "year": 2021, "perf": 17.0, "boost": 2589, "sh": 2048, "rt": 32, "tn": 64, "mem": 8, "mt": "GDDR6", "memf": 16000, "bus": 128, "bw": 256, "tgp": 160, "psu": 500, "pwr": "1×8-pin", "dx": "12 Ultimate", "ogl": "4.6", "vulk": "1.3", "ray": true, "up": "FSR 2", "res": "7680×4320", "mon": 4, "brand": "AMD"}, {"name": "Radeon RX 6700 XT", "chip": "Navi 22", "arch": "RDNA 2", "proc": "7 нм", "year": 2021, "perf": 23.0, "boost": 2424, "sh": 2560, "rt": 40, "tn": 80, "mem": 12, "mt": "GDDR6", "memf": 16000, "bus": 192, "bw": 384, "tgp": 230, "psu": 650, "pwr": "1×12-pin", "dx": "12 Ultimate", "ogl": "4.6", "vulk": "1.3", "ray": true, "up": "FSR 2", "res": "7680×4320", "mon": 4, "brand": "AMD"}, {"name": "Radeon RX 6750 XT", "chip": "Navi 22", "arch": "RDNA 2", "proc": "7 нм", "year": 2022, "perf": 25.0, "boost": 2600, "sh": 2560, "rt": 40, "tn": 80, "mem": 12, "mt": "GDDR6", "memf": 18000, "bus": 192, "bw": 384, "tgp": 250, "psu": 650, "pwr": "1×12-pin", "dx": "12 Ultimate", "ogl": "4.6", "vulk": "1.3", "ray": true, "up": "FSR 2", "res": "7680×4320", "mon": 4, "brand": "AMD"}, {"name": "Radeon RX 6800", "chip": "Navi 21", "arch": "RDNA 2", "proc": "7 нм", "year": 2020, "perf": 27.5, "boost": 2105, "sh": 3840, "rt": 60, "tn": 120, "mem": 16, "mt": "GDDR6", "memf": 16000, "bus": 256, "bw": 512, "tgp": 250, "psu": 650, "pwr": "2×8-pin", "dx": "12 Ultimate", "ogl": "4.6", "vulk": "1.3", "ray": true, "up": "FSR 2", "res": "7680×4320", "mon": 4, "brand": "AMD"}, {"name": "Radeon RX 6800 XT", "chip": "Navi 21", "arch": "RDNA 2", "proc": "7 нм", "year": 2020, "perf": 34.0, "boost": 2250, "sh": 4608, "rt": 72, "tn": 144, "mem": 16, "mt": "GDDR6", "memf": 16000, "bus": 256, "bw": 512, "tgp": 300, "psu": 750, "pwr": "2×8-pin", "dx": "12 Ultimate", "ogl": "4.6", "vulk": "1.3", "ray": true, "up": "FSR 2", "res": "7680×4320", "mon": 4, "brand": "AMD"}, {"name": "Radeon RX 6900 XT", "chip": "Navi 21", "arch": "RDNA 2", "proc": "7 нм", "year": 2021, "perf": 37.0, "boost": 2250, "sh": 5120, "rt": 80, "tn": 160, "mem": 16, "mt": "GDDR6", "memf": 16000, "bus": 256, "bw": 512, "tgp": 300, "psu": 750, "pwr": "2×8-pin", "dx": "12 Ultimate", "ogl": "4.6", "vulk": "1.3", "ray": true, "up": "FSR 2", "res": "7680×4320", "mon": 4, "brand": "AMD"}, {"name": "Radeon RX 6950 XT", "chip": "Navi 21", "arch": "RDNA 2", "proc": "7 нм", "year": 2022, "perf": 39.0, "boost": 2310, "sh": 5120, "rt": 80, "tn": 160, "mem": 16, "mt": "GDDR6", "memf": 18000, "bus": 256, "bw": 576, "tgp": 335, "psu": 800, "pwr": "3×8-pin", "dx": "12 Ultimate", "ogl": "4.6", "vulk": "1.3", "ray": true, "up": "FSR 2", "res": "7680×4320", "mon": 4, "brand": "AMD"}, {"name": "Radeon RX 7600", "chip": "Navi 33", "arch": "RDNA 3", "proc": "5 нм", "year": 2023, "perf": 15.5, "boost": 2755, "sh": 2048, "rt": 32, "tn": 64, "mem": 8, "mt": "GDDR6", "memf": 18000, "bus": 128, "bw": 288, "tgp": 165, "psu": 550, "pwr": "1×8-pin", "dx": "12 Ultimate", "ogl": "4.6", "vulk": "1.3", "ray": true, "up": "FSR 3", "res": "7680×4320", "mon": 4, "brand": "AMD"}, {"name": "Radeon RX 7700 XT", "chip": "Navi 32", "arch": "RDNA 3", "proc": "5 нм", "year": 2024, "perf": 27.5, "boost": 2544, "sh": 3456, "rt": 54, "tn": 108, "mem": 12, "mt": "GDDR6", "memf": 18000, "bus": 192, "bw": 432, "tgp": 245, "psu": 650, "pwr": "2×8-pin", "dx": "12 Ultimate", "ogl": "4.6", "vulk": "1.3", "ray": true, "up": "FSR 3", "res": "7680×4320", "mon": 4, "brand": "AMD"}, {"name": "Radeon RX 7800 XT", "chip": "Navi 32", "arch": "RDNA 3", "proc": "5 нм", "year": 2023, "perf": 33.0, "boost": 2430, "sh": 3840, "rt": 60, "tn": 120, "mem": 16, "mt": "GDDR6", "memf": 19500, "bus": 256, "bw": 624, "tgp": 263, "psu": 700, "pwr": "2×8-pin", "dx": "12 Ultimate", "ogl": "4.6", "vulk": "1.3", "ray": true, "up": "FSR 3", "res": "7680×4320", "mon": 4, "brand": "AMD"}, {"name": "Radeon RX 7900 GRE", "chip": "Navi 31", "arch": "RDNA 3", "proc": "5 нм", "year": 2023, "perf": 38.0, "boost": 2245, "sh": 5120, "rt": 80, "tn": 160, "mem": 16, "mt": "GDDR6", "memf": 18000, "bus": 256, "bw": 576, "tgp": 260, "psu": 650, "pwr": "2×8-pin", "dx": "12 Ultimate", "ogl": "4.6", "vulk": "1.3", "ray": true, "up": "FSR 3", "res": "7680×4320", "mon": 4, "brand": "AMD"}, {"name": "Radeon RX 7900 XT", "chip": "Navi 31", "arch": "RDNA 3", "proc": "5 нм", "year": 2022, "perf": 46.0, "boost": 2400, "sh": 5376, "rt": 84, "tn": 168, "mem": 20, "mt": "GDDR6", "memf": 20000, "bus": 320, "bw": 800, "tgp": 315, "psu": 750, "pwr": "2×8-pin", "dx": "12 Ultimate", "ogl": "4.6", "vulk": "1.3", "ray": true, "up": "FSR 3", "res": "7680×4320", "mon": 4, "brand": "AMD"}, {"name": "Radeon RX 7900 XTX", "chip": "Navi 31", "arch": "RDNA 3", "proc": "5 нм", "year": 2022, "perf": 52.0, "boost": 2500, "sh": 6144, "rt": 96, "tn": 192, "mem": 24, "mt": "GDDR6", "memf": 20000, "bus": 384, "bw": 960, "tgp": 355, "psu": 800, "pwr": "2×8-pin", "dx": "12 Ultimate", "ogl": "4.6", "vulk": "1.3", "ray": true, "up": "FSR 3", "res": "7680×4320", "mon": 4, "brand": "AMD"}, {"name": "Radeon RX 9060 XT 8GB", "chip": "Navi 44", "arch": "RDNA 4", "proc": "4 нм", "year": 2025, "perf": 29.0, "boost": 3130, "sh": 2048, "rt": 32, "tn": 64, "mem": 8, "mt": "GDDR6", "memf": 20000, "bus": 128, "bw": 320, "tgp": 160, "psu": 550, "pwr": "1×8-pin", "dx": "12 Ultimate", "ogl": "4.6", "vulk": "1.3", "ray": true, "up": "FSR 4", "res": "7680×4320", "mon": 4, "brand": "AMD"}, {"name": "Radeon RX 9060 XT 16GB", "chip": "Navi 44", "arch": "RDNA 4", "proc": "4 нм", "year": 2025, "perf": 30.0, "boost": 3130, "sh": 2048, "rt": 32, "tn": 64, "mem": 16, "mt": "GDDR6", "memf": 20000, "bus": 128, "bw": 320, "tgp": 182, "psu": 600, "pwr": "1×8-pin", "dx": "12 Ultimate", "ogl": "4.6", "vulk": "1.3", "ray": true, "up": "FSR 4", "res": "7680×4320", "mon": 4, "brand": "AMD"}, {"name": "Radeon RX 9070", "chip": "Navi 48", "arch": "RDNA 4", "proc": "4 нм", "year": 2025, "perf": 52.0, "boost": 2520, "sh": 3584, "rt": 56, "tn": 112, "mem": 16, "mt": "GDDR6", "memf": 20000, "bus": 256, "bw": 644.6, "tgp": 220, "psu": 650, "pwr": "2×8-pin", "dx": "12 Ultimate", "ogl": "4.6", "vulk": "1.3", "ray": true, "up": "FSR 4", "res": "7680×4320", "mon": 4, "brand": "AMD"}, {"name": "Radeon RX 9070 XT", "chip": "Navi 48", "arch": "RDNA 4", "proc": "4 нм", "year": 2025, "perf": 59.0, "boost": 2970, "sh": 4096, "rt": 64, "tn": 128, "mem": 16, "mt": "GDDR6", "memf": 20000, "bus": 256, "bw": 644.6, "tgp": 304, "psu": 750, "pwr": "3×8-pin", "dx": "12 Ultimate", "ogl": "4.6", "vulk": "1.3", "ray": true, "up": "FSR 4", "res": "7680×4320", "mon": 4, "brand": "AMD"}, {"name": "Intel Arc A310", "chip": "ACM-G11", "arch": "Alchemist", "proc": "6 нм", "year": 2022, "perf": 1.8, "boost": 2000, "sh": 768, "rt": 6, "tn": 48, "mem": 4, "mt": "GDDR6", "memf": 15500, "bus": 64, "bw": 124, "tgp": 75, "psu": 300, "pwr": "—", "dx": "12 Ultimate", "ogl": "4.6", "vulk": "1.3", "ray": true, "up": "XeSS", "res": "7680×4320", "mon": 4, "brand": "Intel"}, {"name": "Intel Arc A380", "chip": "ACM-G11", "arch": "Alchemist", "proc": "6 нм", "year": 2022, "perf": 3.2, "boost": 2200, "sh": 1024, "rt": 8, "tn": 64, "mem": 6, "mt": "GDDR6", "memf": 15500, "bus": 96, "bw": 186, "tgp": 75, "psu": 350, "pwr": "1×8-pin", "dx": "12 Ultimate", "ogl": "4.6", "vulk": "1.3", "ray": true, "up": "XeSS", "res": "7680×4320", "mon": 4, "brand": "Intel"}, {"name": "Intel Arc A580", "chip": "ACM-G10", "arch": "Alchemist", "proc": "6 нм", "year": 2023, "perf": 7.5, "boost": 1700, "sh": 2048, "rt": 16, "tn": 128, "mem": 8, "mt": "GDDR6", "memf": 16000, "bus": 256, "bw": 512, "tgp": 185, "psu": 500, "pwr": "1×8-pin", "dx": "12 Ultimate", "ogl": "4.6", "vulk": "1.3", "ray": true, "up": "XeSS", "res": "7680×4320", "mon": 4, "brand": "Intel"}, {"name": "Intel Arc A750", "chip": "ACM-G10", "arch": "Alchemist", "proc": "6 нм", "year": 2022, "perf": 9.8, "boost": 2050, "sh": 2304, "rt": 28, "tn": 224, "mem": 8, "mt": "GDDR6", "memf": 16000, "bus": 256, "bw": 512, "tgp": 225, "psu": 550, "pwr": "1×8-pin", "dx": "12 Ultimate", "ogl": "4.6", "vulk": "1.3", "ray": true, "up": "XeSS", "res": "7680×4320", "mon": 4, "brand": "Intel"}, {"name": "Intel Arc A770 8GB", "chip": "ACM-G10", "arch": "Alchemist", "proc": "6 нм", "year": 2022, "perf": 10.2, "boost": 2100, "sh": 2304, "rt": 32, "tn": 256, "mem": 8, "mt": "GDDR6", "memf": 17500, "bus": 256, "bw": 560, "tgp": 225, "psu": 550, "pwr": "1×8-pin", "dx": "12 Ultimate", "ogl": "4.6", "vulk": "1.3", "ray": true, "up": "XeSS", "res": "7680×4320", "mon": 4, "brand": "Intel"}, {"name": "Intel Arc A770 16GB", "chip": "ACM-G10", "arch": "Alchemist", "proc": "6 нм", "year": 2022, "perf": 10.2, "boost": 2100, "sh": 2304, "rt": 32, "tn": 256, "mem": 16, "mt": "GDDR6", "memf": 17500, "bus": 256, "bw": 560, "tgp": 225, "psu": 550, "pwr": "1×8-pin", "dx": "12 Ultimate", "ogl": "4.6", "vulk": "1.3", "ray": true, "up": "XeSS", "res": "7680×4320", "mon": 4, "brand": "Intel"}, {"name": "Intel Arc B570", "chip": "BMG-G21", "arch": "Battlemage", "proc": "5 нм", "year": 2025, "perf": 13.5, "boost": 2500, "sh": 1536, "rt": 24, "tn": 96, "mem": 10, "mt": "GDDR6", "memf": 19000, "bus": 192, "bw": 456, "tgp": 150, "psu": 500, "pwr": "1×8-pin", "dx": "12 Ultimate", "ogl": "4.6", "vulk": "1.3", "ray": true, "up": "XeSS 2", "res": "7680×4320", "mon": 4, "brand": "Intel"}, {"name": "Intel Arc B580", "chip": "BMG-G21", "arch": "Battlemage", "proc": "5 нм", "year": 2024, "perf": 16.5, "boost": 2670, "sh": 2560, "rt": 40, "tn": 160, "mem": 12, "mt": "GDDR6", "memf": 20000, "bus": 192, "bw": 456, "tgp": 190, "psu": 600, "pwr": "1×8-pin", "dx": "12 Ultimate", "ogl": "4.6", "vulk": "1.3", "ray": true, "up": "XeSS 2", "res": "7680×4320", "mon": 4, "brand": "Intel"}];
+const PH = {"7800 GTX": "GeForce 7800 GTX.jpg", "8800 GTX": "GeForce 8800 GTX.jpg", "8800 GT": "GeForce 8800 GT.jpg", "9600 GT": "GeForce 9600 GT.jpg", "GTX 280": "GeForce GTX 280.jpg", "GTX 285": "GeForce GTX 285.jpg", "GTX 260": "GeForce GTX 260.jpg", "GTX 480": "GeForce GTX 480.jpg", "GTX 560 Ti": "GeForce GTX 560 Ti.jpg", "GTX 580": "GeForce GTX 580.jpg", "GTX 650 Ti": "GeForce GTX 650 Ti.jpg", "GTX 660": "GeForce GTX 660.jpg", "GTX 680": "GeForce GTX 680.jpg", "GTX 690": "GeForce GTX 690.jpg", "GTX Titan": "GeForce GTX Titan.jpg", "GTX 750 Ti": "GeForce GTX 750 Ti.jpg", "GTX 950": "GeForce GTX 950.jpg", "GTX 960": "GeForce GTX 960.jpg", "GTX 970": "GeForce GTX 970.jpg", "GTX 980": "GeForce GTX 980.jpg", "GTX 980 Ti": "GeForce GTX 980 Ti.jpg", "Titan Xp": "NVIDIA TITAN Xp.jpg", "GTX 1050 Ti": "GeForce GTX 1050 Ti (MSI).jpg", "GTX 1060 6GB": "GeForce GTX 1060 (Founders Edition).jpg", "GTX 1070": "GeForce GTX 1070 (Founders Edition).jpg", "GTX 1080": "GeForce GTX 1080 (Founders Edition).jpg", "GTX 1080 Ti": "GeForce GTX 1080 Ti Founders Edition.jpg", "GTX 1650": "GeForce GTX 1650 (Gigabyte).jpg", "GTX 1660 Ti": "GeForce GTX 1660 Ti.jpg", "RTX 2060": "GeForce RTX 2060 (Founders Edition).jpg", "RTX 2070": "GeForce RTX 2070 (Founders Edition).jpg", "RTX 2080": "GeForce RTX 2080 (Founders Edition).jpg", "RTX 2080 Ti": "GeForce RTX 2080 Ti (Founders Edition).jpg", "RTX 3050 8GB": "NVIDIA GeForce RTX 3050.jpg", "RTX 3060 12GB": "NVIDIA GeForce RTX 3060.jpg", "RTX 3070": "NVIDIA GeForce RTX 3070.jpg", "RTX 3080 10GB": "Nvidia GeForce RTX 3080.jpg", "RTX 3090": "Nvidia GeForce RTX 3090.jpg", "RTX 4060": "NVIDIA GeForce RTX 4060 (dual fan).jpg", "RTX 4070": "NVIDIA GeForce RTX 4070.jpg", "RTX 4080": "Nvidia GeForce RTX 4080.jpg", "RTX 4090": "NVIDIA GeForce RTX 4090.jpg", "RTX 5080": "Nvidia GeForce RTX 5080.jpg", "RTX 5090": "NVIDIA GeForce RTX 5090.jpg", "HD 4870": "Radeon HD 4870.jpg", "HD 5870": "Radeon HD 5870.jpg", "HD 6870": "Radeon HD 6870.jpg", "HD 7970": "Radeon HD 7970.jpg", "R9 290": "AMD Radeon R9 290.jpg", "R9 290X": "AMD Radeon R9 290X (Reference).jpg", "Fury X": "AMD Radeon R9 Fury X.jpg", "RX 470": "AMD Radeon RX 470 (MSI).jpg", "RX 480": "AMD Radeon RX 480 (reference).jpg", "RX 570": "AMD Radeon RX 570.jpg", "RX 580": "AMD Radeon RX 580.jpg", "RX Vega 64": "AMD Radeon RX Vega 64 (reference).jpg", "RX 5700 XT": "AMD Radeon RX 5700 XT.jpg", "RX 6600": "AMD Radeon RX 6600.jpg", "RX 6800 XT": "AMD Radeon RX 6800 XT (reference).jpg", "RX 6900 XT": "AMD Radeon RX 6900 XT (Reference).jpg", "RX 6950 XT": "AMD Radeon RX 6950 XT.jpg", "RX 7600": "AMD Radeon RX 7600.jpg", "RX 7900 XT": "AMD Radeon RX 7900 XT (reference).jpg", "RX 7900 XTX": "AMD Radeon RX 7900 XTX Reference.jpg", "RX 9070 XT": "AMD Radeon RX 9070 XT.jpg", "A770 16GB": "Intel Arc A770 Limited Edition.jpg", "B580": "Intel Arc B580.jpg"};
+const FP = 'https://commons.wikimedia.org/wiki/Special:FilePath/';
+</script>
+<script>
+
+const SECS = [
+  ['Общие', [
+    ['Производитель GPU', c=>c.brand],
+    ['Графический чип', c=>c.chip],
+    ['Архитектура', c=>c.arch],
+    ['Техпроцесс', c=>c.proc],
+    ['Год выпуска', c=>c.year, 'year', false],
+    ['Класс', c=>cls(c)],
+  ]],
+  ['Графический процессор', [
+    ['Boost-частота', c=>c.boost? c.boost+' МГц':'—', 'boost', true],
+    ['Шейдерные блоки', c=>c.sh.toLocaleString('ru-RU'), 'sh', true],
+    ['RT-блоки', c=>c.rt||'—', 'rt', true],
+    ['Тензорные / ИИ-блоки', c=>c.tn||'—', 'tn', true],
+    ['Индекс производительности', c=>c.perf.toFixed(1), 'perf', true],
+  ]],
+  ['Видеопамять', [
+    ['Объём', c=>fmtMem(c.mem), 'mem', true],
+    ['Тип памяти', c=>c.mt],
+    ['Эффективная частота', c=>c.memf.toLocaleString('ru-RU')+' МГц', 'memf', true],
+    ['Разрядность шины', c=>c.bus+' бит', 'bus', true],
+    ['Пропускная способность', c=>c.bw+' ГБ/с', 'bw', true],
+  ]],
+  ['Программные возможности', [
+    ['DirectX', c=>c.dx],
+    ['OpenGL', c=>c.ogl],
+    ['Vulkan', c=>c.vulk],
+    ['Трассировка лучей', c=>c.ray?'Да':'Нет'],
+    ['Апскейл', c=>c.up],
+  ]],
+  ['Питание', [
+    ['TGP', c=>c.tgp+' Вт', 'tgp', true, true],
+    ['Рекомендуемый БП', c=>c.psu+' Вт', 'psu', true, true],
+    ['Разъёмы питания', c=>c.pwr],
+  ]],
+  ['Дисплеи', [
+    ['Максимальное разрешение', c=>c.res],
+    ['Макс. число мониторов', c=>c.mon, 'mon', true],
+  ]],
+];
+function fmtMem(g){ return g>=1? g+' ГБ' : Math.round(g*1024)+' МБ'; }
+function cls(c){ return c.perf>=50?'Флагман': c.perf>=20?'Производительная': c.perf>=5?'Средняя':'Начальная'; }
+const AUTO = (function(){ try{ return JSON.parse(localStorage.getItem('gp_auto')||'{}')||{}; }catch(e){ return {}; } })();
+function autoSave(){ try{ localStorage.setItem('gp_auto', JSON.stringify(AUTO)); }catch(e){} }
+function photoUrl(c){
+  const k = phKeyOf(c);
+  if(k) return FP + encodeURIComponent(PH[k]);
+  const a = AUTO[c.name];
+  return a ? FP + encodeURIComponent(a) : null;
+}
+const colors = {NVIDIA:'#76b900',AMD:'#ed1c24',Intel:'#009fd6'};
+const PHMAX = 5;
+function pkey(n,i){ return 'gp_ph::'+n+'::'+i; }
+function pold(n){ return 'gp_ph::'+n; }
+function customPhotos(n){
+  const out = [];
+  try{
+    for(let i=0;i<PHMAX;i++){ const v = localStorage.getItem(pkey(n,i)); if(v) out.push(v); }
+    if(!out.length){ const v = localStorage.getItem(pold(n)); if(v) out.push(v); }
+  }catch(e){}
+  return out;
+}
+function migratePhoto(n){
+  try{
+    const v = localStorage.getItem(pold(n));
+    if(v && !localStorage.getItem(pkey(n,0))){ localStorage.setItem(pkey(n,0), v); localStorage.removeItem(pold(n)); }
+  }catch(e){}
+}
+let curDetailName = null, galName = null, galCur = 0;
+function phKeyOf(c){
+  return Object.keys(PH).find(k => c.name.endsWith(k) || (' '+c.name+' ').includes(' '+k+' ')) || null;
+}
+function phHTML(c, big){
+  const mine = customPhotos(c.name);
+  if(mine.length) return '<img loading="lazy" src="'+mine[0]+'" alt="'+esc(c.name)+'" style="max-width:100%;object-fit:contain">';
+  const u = photoUrl(c);
+  if(u) return '<img loading="lazy" src="'+u+'" alt="'+esc(c.name)+'" onerror="imgFail(this,'+JSON.stringify(c.name).replace(/"/g,'&quot;')+')">';
+  return '<svg width="'+(big?260:180)+'" height="'+(big?200:120)+'" xmlns="http://www.w3.org/2000/svg"><rect width="100%" height="100%" rx="8" fill="#141a24"/><circle cx="70" cy="80" r="30" fill="none" stroke="'+(colors[c.brand]||'#4f8cff')+'" stroke-width="4"/><circle cx="190" cy="80" r="30" fill="none" stroke="'+(colors[c.brand]||'#4f8cff')+'" stroke-width="4"/><path d="M70 60 l20 20 -20 20z M190 60 l20 20 -20 20z" fill="'+(colors[c.brand]||'#4f8cff')+'"/><text x="130" y="150" fill="#8b93a5" font-size="15" text-anchor="middle">'+esc(c.brand)+'</text></svg>';
+}
+function imgFail(img, name){
+  const c = DATA.find(x=>x.name===name);
+  if(!c) return;
+  const d = document.createElement('div');
+  d.innerHTML = phHTML(c, img.closest('.img'));
+  img.replaceWith(d.firstChild);
+}
+function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+const sel = new Set();
+let curSort = 'perf', cmpOpen = false;
+
+function filtered(){
+  const q = document.getElementById('q').value.trim().toLowerCase();
+  const fb = document.getElementById('fBrand').value, fc = document.getElementById('fClass').value;
+  const fm = +document.getElementById('fMem').value, fy = +document.getElementById('fYear').value;
+  const fr = document.getElementById('fRay').checked;
+  let arr = DATA.filter(c=>
+    (!q || (c.name+' '+c.chip+' '+c.arch).toLowerCase().includes(q)) &&
+    (!fb || c.brand===fb) && (!fc || cls(c)===fc) &&
+    (!fm || c.mem>=fm) && (!fy || c.year>=fy) && (!fr || c.ray));
+  const k = curSort;
+  arr.sort((a,b)=> k==='name'? a.name.localeCompare(b.name) :
+    k==='tgp'? a.tgp-b.tgp :
+    k==='-year'? b.year-a.year || b.perf-a.perf :
+    k==='year'? a.year-b.year || a.perf-b.perf : b[k]-a[k]);
+  return arr;
+}
+function render(){
+  const arr = filtered(), g = document.getElementById('grid');
+  document.getElementById('cnt').textContent = 'Найдено: '+arr.length;
+  g.innerHTML = arr.map(c=>{
+    const checked = sel.has(c.name);
+    return '<div class="card" data-name="'+esc(c.name)+'">'+
+      '<div class="ph">'+phHTML(c,false)+'</div>'+
+      '<h3 class="brand-'+c.brand+'">'+esc(c.name)+'</h3>'+
+      '<div class="meta">'+esc(c.chip)+' · '+esc(c.arch)+' · '+c.year+' · '+cls(c)+'</div>'+
+      '<div class="rowline"><span>Производительность</span><b>'+c.perf.toFixed(1)+'</b></div>'+
+      '<div class="pbar"><i style="width:'+c.perf+'%"></i></div>'+
+      '<div class="rowline"><span>Память</span><b>'+fmtMem(c.mem)+' '+esc(c.mt)+'</b></div>'+
+      '<div class="rowline"><span>Boost</span><b>'+(c.boost? c.boost+' МГц':'—')+'</b></div>'+
+      '<div class="rowline"><span>TGP</span><b>'+c.tgp+' Вт</b></div>'+
+      '<div class="cbtns"><button class="link" onclick="event.stopPropagation();detail(this.closest(\'.card\').dataset.name)">Подробнее</button>'+
+      '<span style="flex:1"></span><label><input type="checkbox" class="cbx" '+(checked?'checked':'')+' onclick="event.stopPropagation();toggleSel(\''+esc(c.name)+'\',this)"> сравнить</label></div>'+
+    '</div>';
+  }).join('');
+  g.querySelectorAll('.card').forEach(el=>{
+    el.addEventListener('click', e=>{ if(e.target.type==='checkbox') return; detail(el.dataset.name); });
+  });
+}
+function toggleSel(name, cb){
+  if(cb.checked) sel.add(name); else sel.delete(name);
+  if(sel.size>4){ sel.delete(name); cb.checked=false; alert('Не больше 4 карт'); return; }
+  const b = document.getElementById('cmpBtn');
+  b.style.display = sel.size>=2 ? 'block':'none';
+  b.textContent = 'Сравнить ('+sel.size+')';
+}
+function cmpOpenFn(){
+  const list = [...sel].map(n=>DATA.find(c=>c.name===n));
+  cmpOpen = true;
+  const c = document.getElementById('cmp');
+  c.style.display='block';
+  const onlyDiffs = document.getElementById('onlyD') && document.getElementById('onlyD').checked;
+  let body='';
+  for(const [title, rows] of SECS){
+    const visible = rows.filter(r=>{
+      if(!onlyDiffs) return true;
+      if(r[2]===undefined) return true;
+      const vals = list.map(c=>c[r[2]]);
+      if(r[2]==='mem' || r[2]==='perf') return vals.some(v=>v!==vals[0]) || new Set(list.map(c=>c[r[2]]==='mem'? c.mem : c.perf)).size>1;
+      return new Set(vals).size>1;
+    });
+    if(!visible.length && onlyDiffs) continue;
+    if(visible.length===0) continue;
+    body += '<tr><td class="sec" colspan="'+(list.length+1)+'">'+title+'</td></tr>';
+    for(const r of visible){
+      let tds='';
+      for(const cc of list){
+        let clsT='';
+        if(r[3]){ // числовое
+          const nums = list.map(x=>x[r[2]]);
+          if(new Set(nums).size>1){
+            if(r[4]){ if(cc[r[2]]===Math.min(...nums)) clsT='good'; else if(cc[r[2]]===Math.max(...nums)) clsT='bad'; }
+            else { if(cc[r[2]]===Math.max(...nums)) clsT='good'; else if(cc[r[2]]===Math.min(...nums)) clsT='bad'; }
+          }
+        }
+        tds += '<td class="'+clsT+'">'+r[1](cc)+'</td>';
+      }
+      body += '<tr><td class="tdl">'+r[0]+'</td>'+tds+'</tr>';
+    }
+  }
+  let header = list.map(cc=>'<th><div style="max-width:150px">'+phHTML(cc,false)+'</div><div class="brand-'+cc.brand+'" style="margin-top:6px">'+esc(cc.name)+'</div><div class="cp">'+cls(cc)+'</div></th>').join('');
+  const shown = body.split('<tr><td class="sec"').length-1;
+  c.innerHTML = '<h2>Сравнение</h2>'+
+    '<div class="tools"><label><input type="checkbox" id="onlyD" '+(onlyDiffs?'checked':'')+' onchange="cmpOpenFn()"> показать только отличающиеся параметры</label>'+
+    '<span id="diffCnt">Отличий: '+countDiffs(list)+'</span>'+
+    '<button class="link" onclick="clearCmp()">✕ закрыть сравнение</button></div>'+
+    '<div class="tw"><table><tr><th>Параметр</th>'+header+'</tr>'+body+'</table></div>'+
+    '<button class="link back" onclick="window.scrollTo({top:0,behavior:\'smooth\'})">↑ К списку карт</button>';
+  c.scrollIntoView({behavior:'smooth'});
+}
+function countDiffs(list){
+  let n=0;
+  for(const [,rows] of SECS) for(const r of rows){ if(r[2]===undefined) continue; const vals=list.map(c=>c[r[2]]); if(new Set(vals).size>1) n++; }
+  return n;
+}
+function clearCmp(){
+  cmpOpen=false; sel.clear();
+  document.getElementById('cmpBtn').style.display='none';
+  document.getElementById('cmp').style.display='none';
+  document.querySelectorAll('.cbx').forEach(cb=>cb.checked=false);
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+function gallerySlides(c, k, u){
+  const ph = customPhotos(c.name);
+  const out = ph.map(function(src,i){ return {src:src, cap:'Ваше фото '+(i+1)+' из '+ph.length+' — сохранено в этом браузере', own:true}; });
+  if(u) out.push({src:u, cap: k ? 'Фото: '+esc(PH[k])+' (Wikimedia Commons)' : 'Фото: Wikimedia Commons', own:false});
+  return out;
+}
+function detail(name){
+  curDetailName = name;
+  migratePhoto(name);
+  const c = DATA.find(x=>x.name===name);
+  const k = phKeyOf(c);
+  const u = photoUrl(c);
+  const ph = customPhotos(name);
+  const slides = gallerySlides(c, k, u);
+  if(galName !== name){ galName = name; galCur = 0; }
+  if(galCur >= slides.length) galCur = Math.max(0, slides.length-1);
+  const s = slides.length ? slides[galCur] : null;
+  let big;
+  if(s){
+    let imgTag = '<img src="'+s.src+'" alt="'+esc(c.name)+'" style="max-width:100%;object-fit:contain"';
+    imgTag += s.own ? '>' : ' onerror="imgFail(this,'+JSON.stringify(c.name).replace(/"/g,'&quot;')+')">';
+    big = '<div class="img imgwrap">'+imgTag;
+    if(slides.length > 1){
+      big += '<button class="garr left" onclick="galGo('+(galCur===0?slides.length-1:galCur-1)+')">‹</button>'
+           + '<button class="garr right" onclick="galGo('+(galCur===slides.length-1?0:galCur+1)+')">›</button>';
+    }
+    big += '</div>';
+  } else {
+    big = '<div class="img">'+phHTML(c,true)+'</div>';
+  }
+  const cap = s
+    ? '<div class="phc'+(s.own?' custom':'')+'">'+(slides.length>1?'<span class="gcnt">'+(galCur+1)+' / '+slides.length+'</span> &nbsp; ':'')+s.cap+'</div>'
+    : '<div class="phc">Фотографий нет — можно добавить до '+PHMAX+' своих</div>';
+  let thumbs = '';
+  if(slides.length){
+    thumbs = '<div class="thumbs">'+slides.map(function(sl,i){
+      const del = sl.own ? '<button class="tx" onclick="event.stopPropagation();delPhoto('+i+')">✕</button>' : '';
+      const err = sl.own ? '' : ' onerror="this.parentNode.style.display=\'none\'"';
+      return '<div class="thumb'+(i===galCur?' cur':'')+'" onclick="galGo('+i+')">'+del+'<img src="'+sl.src+'" alt=""'+err+'></div>';
+    }).join('')+'</div>';
+  }
+  const left = PHMAX - ph.length;
+  const pmgr = '<div class="pmgr">'
+    + (left > 0
+        ? '<label class="pbtn"><input type="file" accept="image/*" multiple style="display:none" onchange="photoPick(this)">📷 Добавить фото'+(ph.length?' — ещё '+left+' (из '+PHMAX+')':' (до '+PHMAX+')')+'</label>'
+        : '<span class="pbtn dim">Лимит — '+PHMAX+' фото достигнут</span>')
+    + (ph.length ? '<button class="pbtn warn" onclick="delAll()">Убрать все мои ('+ph.length+')</button>' : '')
+    + '</div>';
+  let secs='';
+  for(const [title, rows] of SECS){
+    secs += '<div class="msec"><h4>'+title+'</h4>'+rows.map(r=>'<div class="mrow"><span>'+r[0]+'</span><b>'+r[1](c)+'</b></div>').join('')+'</div>';
+  }
+  document.getElementById('mbox').innerHTML = '<button class="close" onclick="closeModal()">✕</button><h2 class="brand-'+c.brand+'">'+esc(c.name)+'</h2><div class="meta">'+cls(c)+' · '+c.year+'</div>'+big+cap+thumbs+pmgr+secs;
+  document.getElementById('modal').style.display='flex';
+}
+function closeModal(){ document.getElementById('modal').style.display='none'; }
+function photoPick(inp){
+  if(!curDetailName) return;
+  const files = Array.prototype.slice.call(inp.files || []);
+  inp.value = '';
+  if(!files.length) return;
+  let free = [];
+  try{
+    for(let i=0;i<PHMAX;i++){ if(!localStorage.getItem(pkey(curDetailName,i))) free.push(i); }
+  }catch(e){}
+  if(!free.length){ alert('Лимит — '+PHMAX+' фото на карточку. Сначала удалите лишнее крестиком на миниатюре.'); return; }
+  const todo = files.slice(0, free.length);
+  if(todo.length < files.length) alert('Добавлю только '+todo.length+' из '+files.length+' фото: лимит — '+PHMAX+'.');
+  let saved = 0;
+  function next(idx){
+    if(idx >= todo.length){
+      if(saved){ detail(curDetailName); render(); }
+      else alert('Не удалось сохранить фото: хранилище браузера заполнено. Попробуйте файл поменьше или удалите лишние.');
+      return;
+    }
+    const f = todo[idx];
+    const r = new FileReader();
+    r.onload = function(){
+      const im = new Image();
+      im.onload = function(){
+        const mx = 900;
+        let w = im.width, h = im.height;
+        if(Math.max(w,h)>mx){ const k2 = mx/Math.max(w,h); w = Math.round(w*k2); h = Math.round(h*k2); }
+        let out;
+        try{
+          const cv = document.createElement('canvas'); cv.width = w; cv.height = h;
+          cv.getContext('2d').drawImage(im, 0, 0, w, h);
+          out = cv.toDataURL('image/jpeg', 0.82);
+        }catch(e){ out = r.result; }
+        try{ localStorage.setItem(pkey(curDetailName, free[idx]), out); saved++; }
+        catch(e){ /* хранилище заполнено — слот пропускаем */ }
+        next(idx+1);
+      };
+      im.onerror = function(){ next(idx+1); };
+      im.src = r.result;
+    };
+    r.readAsDataURL(f);
+  }
+  next(0);
+}
+function galGo(i){
+  galCur = i;
+  if(galName) detail(galName);
+}
+function delPhoto(i){
+  if(!curDetailName) return;
+  try{ localStorage.removeItem(pkey(curDetailName,i)); }catch(e){}
+  const c = DATA.find(x=>x.name===curDetailName);
+  const total = customPhotos(curDetailName).length + (photoUrl(c) ? 1 : 0);
+  if(galCur >= total) galCur = Math.max(0, total-1);
+  detail(curDetailName);
+  render();
+}
+function delAll(){
+  if(!curDetailName) return;
+  if(!confirm('Убрать все ваши фото этой карточки?')) return;
+  try{
+    for(let i=0;i<PHMAX;i++) localStorage.removeItem(pkey(curDetailName,i));
+    localStorage.removeItem(pold(curDetailName));
+  }catch(e){}
+  galCur = 0;
+  detail(curDetailName);
+  render();
+}
+document.getElementById('modal').addEventListener('click', e=>{ if(e.target.id==='modal') closeModal(); });
+document.getElementById('cmpBtn').addEventListener('click', cmpOpenFn);
+['q','fBrand','fClass','fMem','fYear','fRay','sort'].forEach(id=>{
+  document.getElementById(id).addEventListener('change', ()=>{ if(id==='sort') curSort=document.getElementById('sort').value; render(); });
+  if(id==='q') document.getElementById(id).addEventListener('input', render);
+});
+render();
+
+
+let LBO = {slides:[], i:0, s:1, tx:0, ty:0, open:false};
+function lbEl(id){ return document.getElementById(id); }
+function lbEnsure(){
+  if(lbEl('lbx')) return;
+  document.body.insertAdjacentHTML('beforeend',
+    '<div id="lbx">'
+    +'<div id="lbxTop"><span id="lbxCnt"></span><span id="lbxCap"></span></div>'
+    +'<button class="larr left" id="lbxL" onclick="lbGo(-1)">‹</button>'
+    +'<img id="lbxImg" alt="" draggable="false">'
+    +'<button class="larr right" id="lbxR" onclick="lbGo(1)">›</button>'
+    +'<button id="lbxClose" onclick="lbClose()">✕ Закрыть</button>'
+    +'<div id="lbxHint">колёсико — зум · перетаскивание — двигать · двойной клик — ×3 · ← → — листать · Esc — закрыть</div>'
+    +'</div>');
+  const img = lbEl('lbxImg');
+  img.addEventListener('wheel', lbWheel, {passive:false});
+  img.addEventListener('mousedown', lbDown);
+  img.addEventListener('dblclick', function(){ LBO.s = (LBO.s > 1.5) ? 1 : 3; if(LBO.s===1){ LBO.tx=0; LBO.ty=0; } lbApply(); });
+  lbEl('lbx').addEventListener('click', function(e){ if(e.target.id==='lbx') lbClose(); });
+}
+function openLightbox(name, idx){
+  const c = DATA.find(x=>x.name===name); if(!c) return;
+  const slides = gallerySlides(c, phKeyOf(c), photoUrl(c));
+  if(!slides.length) return;
+  lbEnsure();
+  LBO = {slides:slides, i:Math.min(Math.max(0,idx),slides.length-1), s:1, tx:0, ty:0, open:true};
+  lbEl('lbx').style.display = 'flex';
+  lbShow(LBO.i);
+}
+function lbShow(i){
+  LBO.i = i; LBO.s = 1; LBO.tx = 0; LBO.ty = 0;
+  lbEl('lbxImg').src = LBO.slides[i].src;
+  lbApply();
+  const many = LBO.slides.length > 1;
+  lbEl('lbxL').style.display = many ? 'block' : 'none';
+  lbEl('lbxR').style.display = many ? 'block' : 'none';
+  lbEl('lbxCnt').textContent = many ? (i+1)+' / '+LBO.slides.length : '';
+  lbEl('lbxCap').textContent = LBO.slides[i].cap;
+}
+function lbGo(d){ if(LBO.slides.length < 2) return; lbShow((LBO.i + d + LBO.slides.length) % LBO.slides.length); }
+function lbClose(){ LBO.open = false; lbEl('lbx').style.display = 'none'; }
+function lbApply(){ lbEl('lbxImg').style.transform = 'translate('+LBO.tx+'px,'+LBO.ty+'px) scale('+LBO.s+')'; }
+function lbWheel(e){
+  e.preventDefault();
+  const img = lbEl('lbxImg');
+  const rect = img.getBoundingClientRect();
+  const cx = e.clientX - rect.left - rect.width/2;
+  const cy = e.clientY - rect.top - rect.height/2;
+  const old = LBO.s;
+  const ns = Math.min(10, Math.max(1, old * (e.deltaY < 0 ? 1.2 : 1/1.2)));
+  if(ns === old) return;
+  LBO.tx = LBO.tx - cx*(ns-old)/old;
+  LBO.ty = LBO.ty - cy*(ns-old)/old;
+  LBO.s = ns;
+  if(ns === 1){ LBO.tx = 0; LBO.ty = 0; }
+  lbApply();
+}
+let lbDrag = null;
+function lbDown(e){
+  e.preventDefault();
+  lbDrag = {x:e.clientX, y:e.clientY, tx:LBO.tx, ty:LBO.ty};
+  lbEl('lbxImg').classList.add('drag');
+}
+document.addEventListener('mousemove', function(e){
+  if(!lbDrag || !LBO.open) return;
+  LBO.tx = lbDrag.tx + (e.clientX - lbDrag.x);
+  LBO.ty = lbDrag.ty + (e.clientY - lbDrag.y);
+  lbApply();
+});
+document.addEventListener('mouseup', function(){
+  if(!lbDrag) return;
+  lbDrag = null;
+  const img = lbEl('lbxImg'); if(img) img.classList.remove('drag');
+});
+document.addEventListener('keydown', function(e){
+  if(LBO.open){
+    if(e.key === 'Escape'){ lbClose(); e.preventDefault(); return; }
+    if(e.key === 'ArrowLeft'){ lbGo(-1); return; }
+    if(e.key === 'ArrowRight'){ lbGo(1); return; }
+  } else if(document.getElementById('modal').style.display !== 'none' && e.key === 'Escape'){
+    closeModal();
+  }
+});
+document.addEventListener('click', function(e){
+  const t = e.target;
+  if(t.tagName !== 'IMG') return;
+  if(!t.closest('.img') || t.closest('.garr')) return;
+  if(document.getElementById('modal').style.display === 'none') return;
+  if(t.closest('.thumbs')) return;
+  openLightbox(galName, galCur);
+});
+
+
+const WK_BAD = /logo|icon|diagram|chart|scheme|dataset|benchmark|pinout|placeholder/i;
+function wkPick(j){
+  const pages = (j && j.query && j.query.pages) ? Object.values(j.query.pages) : [];
+  pages.sort(function(a,b){ return (a.index||0)-(b.index||0); });
+  const ext = function(t){ const i = t.lastIndexOf('.'); return i >= 0 ? t.slice(i+1).toLowerCase() : ''; };
+  const ok = pages.filter(function(p){ return !WK_BAD.test(p.title); });
+  const jpgs = ok.filter(function(p){ return ext(p.title)==='jpg' || ext(p.title)==='jpeg' || ext(p.title)==='png' || ext(p.title)==='webp'; });
+  const best = (jpgs.length ? jpgs : ok)[0];
+  return best ? best.title.slice(5) : null;
+}
+function wkSearch(q, cb){
+  const url = 'https://commons.wikimedia.org/w/api.php?action=query&format=json&origin=*&generator=search&gsrnamespace=6&gsrlimit=12&prop=imageinfo&iiprop=url&iiurlwidth=600&gsrsearch='
+    + encodeURIComponent(q + ' graphics card');
+  fetch(url).then(function(r){ return r.json(); }).then(function(j){ cb(wkPick(j)); }).catch(function(){ cb(null); });
+}
+(function warmPhotos(){
+  const need = DATA.filter(function(c){ return !photoUrl(c) && !AUTO[c.name]; }).map(function(c){ return c.name; });
+  let qi = 0, found = 0, active = 0;
+  function updateView(){
+    const modal = document.getElementById('modal');
+    if(modal && modal.style.display !== 'none'){
+      if(galName) detail(galName);
+    } else {
+      render();
+    }
+  }
+  function next(){
+    if(qi >= need.length) return;
+    const name = need[qi++]; active++;
+    wkSearch(name, function(res){
+      active--;
+      if(res){ AUTO[name] = res; autoSave(); found++; }
+      if(res && found % 10 === 0) updateView();
+      next();
+    });
+  }
+  for(let i = 0; i < 3 && i < need.length; i++) next();
+  if(need.length){
+    const iv = setInterval(function(){
+      if(active === 0 && qi >= need.length){ clearInterval(iv); if(found) updateView(); }
+    }, 1500);
+  }
+})();
+
+</script>
+</body></html>
