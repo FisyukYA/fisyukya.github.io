@@ -497,7 +497,7 @@ function autoFetch(c, done){
       const good = pages.filter(function(p){
         if(!p.imageinfo || !p.imageinfo.length) return false;
         const ii = p.imageinfo[0];
-        if(!/\\.(jpe?g|png)$/i.test(p.title || '')) return false;
+        if(!/\.(jpe?g|png)$/i.test(p.title || '')) return false;
         if(autoBadTitle(p.title || '')) return false;
         return (ii.width || 0) >= 400;
       });
